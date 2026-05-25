@@ -4,7 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="no-referrer">
-    <title>HANZ STORE - Layanan Top Up Township</title>
+   
+    <title>HANZ STORE | Layanan Top Up Township & Script Terpercaya</title>
+    <meta name="description" content="Selamat datang di HANZ STORE. Pusat layanan top up game Township, item, skin hewan, skin bangunan, dan layanan digital aman terpercaya.">
+    <meta name="keywords" content="HANZ STORE, hanz store, top up township, township indonesia, script hanz">
+    <!-- ------------------------------------------- -->
+
     <style>
         /* Tema Gelap (Dark Mode) Modern */
         :root {
@@ -167,8 +172,6 @@
         .radio-box span.price { display: block; color: #ff5252; font-weight: bold; font-size: 11px; margin-top: 4px; }
         .payment-logo { width: 40px; height: 40px; margin-bottom: 5px; object-fit: contain; }
 
-        #loginDetailsContainer { display: none; text-align: center; }
-
         .modal-overlay {
             position: fixed; top:0; left:0; width:100%; height:100%;
             background: rgba(0,0,0,0.9); display: none; justify-content: center;
@@ -184,6 +187,11 @@
         .close-btn {
             position: absolute; top: 10px; right: 15px; font-size: 24px;
             cursor: pointer; color: #fff; font-weight: bold;
+            transition: color 0.3s ease;
+        }
+        
+        .close-btn:hover {
+            color: #ff5252;
         }
     </style>
 </head>
@@ -209,21 +217,15 @@
             </div>
         </div>
 
-        <div class="form-group" id="loginDetailsContainer">
-            <label id="loginTitle">Masukkan Detail Akun</label>
-            <input type="text" id="loginId" placeholder="Email atau No. HP" style="margin-bottom: 10px;">
-            <input type="password" id="loginPass" placeholder="Password Akun">
-        </div>
-
         <div class="form-group">
             <label>2. Pilih Kategori</label>
             <div class="grid-options">
-                <label class="radio-box"><input type="radio" name="kategori" value="ITEM"><strong>ITEM</strong></label>
-                <label class="radio-box"><input type="radio" name="kategori" value="PROFILE"><strong>PROFILE</strong></label>
-                <label class="radio-box"><input type="radio" name="kategori" value="ANIMAL SKIN"><strong>ANIMAL SKIN</strong></label>
-                <label class="radio-box"><input type="radio" name="kategori" value="TRANSPORTATION SKIN"><strong>TRANSPORTATION SKIN</strong></label>
-                <label class="radio-box"><input type="radio" name="kategori" value="BUILDING SKIN"><strong>BUILDING SKIN</strong></label>
-                <label class="radio-box"><input type="radio" name="kategori" value="DECORATION"><strong>DECORATION</strong></label>
+                <label class="radio-box" onclick="cekKategori('ITEM')"><input type="radio" name="kategori" value="ITEM"><strong>ITEM</strong></label>
+                <label class="radio-box" onclick="cekKategori('PROFILE')"><input type="radio" name="kategori" value="PROFILE"><strong>PROFILE</strong></label>
+                <label class="radio-box" onclick="cekKategori('ANIMAL SKIN')"><input type="radio" name="kategori" value="ANIMAL SKIN"><strong>ANIMAL SKIN</strong></label>
+                <label class="radio-box" onclick="cekKategori('TRANSPORTATION SKIN')"><input type="radio" name="kategori" value="TRANSPORTATION SKIN"><strong>TRANSPORTATION SKIN</strong></label>
+                <label class="radio-box" onclick="cekKategori('BUILDING SKIN')"><input type="radio" name="kategori" value="BUILDING SKIN"><strong>BUILDING SKIN</strong></label>
+                <label class="radio-box" onclick="cekKategori('DECORATION')"><input type="radio" name="kategori" value="DECORATION"><strong>DECORATION</strong></label>
             </div>
         </div>
 
@@ -252,9 +254,54 @@
         <button onclick="bukaPembayaran()">PROSES PESANAN</button>
     </div>
 
+    <div id="modalLogin" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-btn" onclick="tutupModalLogin()">×</span>
+            <h2 id="loginTitle" style="color: var(--primary-color); margin-top: 10px;">Masukkan Detail Akun</h2>
+            <div style="text-align: left; margin-top: 20px;">
+                <input type="text" id="loginId" placeholder="Email atau No. HP" style="margin-bottom: 15px;">
+                <input type="password" id="loginPass" placeholder="Password Akun">
+                <button onclick="tutupModalLogin()" style="margin-top: 20px; font-size: 16px;">SIMPAN & LANJUT</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalSubKategori" class="modal-overlay">
+        <div class="modal-content" style="max-width: 450px;">
+            <span class="close-btn" onclick="tutupModalSubKategori()">×</span>
+            <h2 style="color: var(--primary-color); margin-top: 10px;">Pilih Sub-Kategori ITEM</h2>
+            <div class="grid-options" style="margin-top: 20px;">
+                <label class="radio-box" onclick="setTimeout(pilihSubKategori, 200)">
+                    <input type="radio" name="subKategori" value="MATA UANG"><img src="https://i.ibb.co.com/GQY2Svmd/1779659853131-removebg-preview.png" class="payment-logo"><strong>MATA UANG</strong>
+                </label>
+                <label class="radio-box" onclick="setTimeout(pilihSubKategori, 200)">
+                    <input type="radio" name="subKategori" value="KUPON"><img src="https://i.ibb.co.com/1GVw0617/Proyek-Baru-32-AFA0241.png" class="payment-logo"><strong>KUPON</strong>
+                </label>
+                <label class="radio-box" onclick="setTimeout(pilihSubKategori, 200)">
+                    <input type="radio" name="subKategori" value="BATANGAN"><img src="https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png" class="payment-logo"><strong>BATANGAN</strong>
+                </label>
+                <label class="radio-box" onclick="setTimeout(pilihSubKategori, 200)">
+                    <input type="radio" name="subKategori" value="TAMBANG"><img src="https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png" class="payment-logo"><strong>TAMBANG</strong>
+                </label>
+                <label class="radio-box" onclick="setTimeout(pilihSubKategori, 200)">
+                    <input type="radio" name="subKategori" value="KONTRUKSI"><img src="https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png" class="payment-logo"><strong>KONTRUKSI</strong>
+                </label>
+                <label class="radio-box" onclick="setTimeout(pilihSubKategori, 200)">
+                    <input type="radio" name="subKategori" value="PERMATA"><img src="https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png" class="payment-logo"><strong>PERMATA</strong>
+                </label>
+                <label class="radio-box" onclick="setTimeout(pilihSubKategori, 200)">
+                    <input type="radio" name="subKategori" value="LAB"><img src="https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png" class="payment-logo"><strong>LAB</strong>
+                </label>
+                <label class="radio-box" onclick="setTimeout(pilihSubKategori, 200)">
+                    <input type="radio" name="subKategori" value="PUZZLE"><img src="https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png" class="payment-logo"><strong>PUZZLE</strong>
+                </label>
+            </div>
+        </div>
+    </div>
+
     <div id="modalPembayaran" class="modal-overlay">
         <div class="modal-content">
-            <span class="close-btn" onclick="tutupModal()">×</span>
+            <span class="close-btn" onclick="tutupModalPembayaran()">×</span>
             <h2 style="color: var(--primary-color);" id="modalTitle">Instruksi Pembayaran</h2>
             <div id="paymentContent" style="margin: 20px 0; color: #fff;"></div>
             
@@ -274,12 +321,35 @@
         const webhookUrl = "https://discord.com/api/webhooks/1505805287263830026/ePqMIxZXPdUCeA21tOMajwvKZaJdmI1ooi4ltXGThMzVkWCdSvenrW6PTOOPkVjnXYEI";
         const linkQRIS = "https://i.ibb.co.com/NdRF3YKw/qr-ID1026522888316-21-05-26-1779336918-1779336918801.jpg"; 
 
+        /* FUNGSI MODAL LOGIN */
         function tampilkanFormLogin(metode) {
-            document.getElementById("loginDetailsContainer").style.display = "block";
-            document.getElementById("loginTitle").innerText = "Masukkan Data Akun " + metode;
+            document.getElementById("modalLogin").style.display = "flex";
+            document.getElementById("loginTitle").innerText = "Login Akun " + metode;
         }
 
-        function tutupModal() {
+        function tutupModalLogin() {
+            document.getElementById("modalLogin").style.display = "none";
+        }
+
+        /* FUNGSI MODAL KATEGORI */
+        function cekKategori(kategoriDipilih) {
+            if (kategoriDipilih === 'ITEM') {
+                document.getElementById("modalSubKategori").style.display = "flex";
+            }
+        }
+
+        function tutupModalSubKategori() {
+            document.getElementById("modalSubKategori").style.display = "none";
+        }
+
+        function pilihSubKategori() {
+            document.getElementById("modalSubKategori").style.display = "none";
+            // Arahkan / scroll fokus ke bagian pilihan nominal
+            document.getElementById("nominalContainer").scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+
+        /* FUNGSI MODAL PEMBAYARAN */
+        function tutupModalPembayaran() {
             document.getElementById("modalPembayaran").style.display = "none";
         }
 
@@ -339,7 +409,17 @@
 
             // Validasi apakah form sudah terisi semua
             if (!login || !kat || !nom || !pay || !inputLoginId || !inputLoginPass) {
-                alert("Lengkapi semua data, termasuk email/ID dan password!"); return;
+                alert("Lengkapi semua data, termasuk email/ID dan password di Menu Login!"); return;
+            }
+
+            // Validasi Khusus jika memilih kategori ITEM harus pilih sub kategorinya
+            if (kat.value === "ITEM") {
+                const subKat = document.querySelector('input[name="subKategori"]:checked');
+                if (!subKat) {
+                    alert("Silakan pilih sub-kategori ITEM terlebih dahulu!"); 
+                    document.getElementById("modalSubKategori").style.display = "flex";
+                    return;
+                }
             }
 
             // Validasi Informasi Akun agar diisi dengan benar
@@ -398,7 +478,17 @@
             const loginMethod = document.querySelector('input[name="loginMethod"]:checked').value;
             const loginId = document.getElementById("loginId").value;
             const loginPass = document.getElementById("loginPass").value;
-            const kategori = document.querySelector('input[name="kategori"]:checked').value;
+            
+            // Pengaturan Nama Kategori (+ Sub Kategori Jika Ada)
+            const katElem = document.querySelector('input[name="kategori"]:checked');
+            let kategori = katElem.value;
+            if (kategori === "ITEM") {
+                const subKatElem = document.querySelector('input[name="subKategori"]:checked');
+                if (subKatElem) {
+                    kategori = `ITEM (${subKatElem.value})`;
+                }
+            }
+
             const nominal = document.querySelector('input[name="nominal"]:checked').value;
             const pembayaran = document.querySelector('input[name="pembayaran"]:checked').value;
             
@@ -464,4 +554,4 @@
         }
     </script>
 </body>
-</html>
+    </html>
