@@ -5,10 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="no-referrer">
    
-    <title id="pageTitle">HANZ STORE | Layanan Top Up Township & Script Terpercaya</title>
-    <meta name="description" content="Selamat datang di HANZ STORE. Pusat layanan top up game Township, item, skin hewan, skin bangunan, dan layanan digital aman terpercaya.">
-    <meta name="keywords" content="HANZ STORE, hanz store, top up township, township indonesia, script hanz, hanzstore.twn, HANZ STORE, TOP UP TOWNSHIP TERLENGKAP, skin, township, hanz township, HANZ TOWNSHIP, SCRIPT, TOWNSHIP, TERLENGKAP, TERPERCAYA,">
-    <!-- ------------------------------------------- -->
+    <!-- ========================================== -->
+    <!-- OPTIMASI SEO GOOGLE UNTUK "hanzstoretwn" -->
+    <!-- ========================================== -->
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="author" content="hanzstoretwn">
+    <title id="pageTitle">HANZ STORE (hanzstoretwn) | Layanan Top Up Township & Script Terpercaya</title>
+    <meta name="description" content="Selamat datang di HANZ STORE (hanzstoretwn). Pusat layanan top up game Township, item, skin hewan, skin bangunan, dan layanan digital aman terpercaya. Cepat, Presisi, dan Aman!">
+    <meta name="keywords" content="hanzstoretwn, HANZ STORE, hanz store, top up township, township indonesia, script hanz, hanzstore.twn, TOP UP TOWNSHIP TERLENGKAP, skin, township, hanz township, HANZ TOWNSHIP, SCRIPT, TOWNSHIP, TERLENGKAP, TERPERCAYA">
+    
+    <!-- Open Graph untuk optimalisasi pencarian & share Sosial Media -->
+    <meta property="og:title" content="HANZ STORE (hanzstoretwn) | Layanan Top Up Township">
+    <meta property="og:description" content="Pusat layanan top up game Township, item, skin, dan layanan digital aman terpercaya oleh hanzstoretwn.">
+    <meta property="og:image" content="https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png">
+    <meta property="og:type" content="website">
+
+    <!-- Schema Markup JSON-LD agar Google mengenali brand hanzstoretwn di Peringkat 1 -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Store",
+      "name": "hanzstoretwn",
+      "alternateName": "HANZ STORE",
+      "description": "Pusat Layanan Top Up Township & Script Terpercaya. Cepat, Murah, dan Aman.",
+      "image": "https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png",
+      "url": "https://hanzstoretwn.com",
+      "priceRange": "$$"
+    }
+    </script>
+    <!-- ========================================== -->
 
     <style>
         /* Variabel Warna Untuk Tema Terang dan Gelap */
@@ -183,7 +208,7 @@
         .side-menu-header img { width: 50px; height: 50px; border-radius: 10px; object-fit: cover;}
         .close-side-btn { font-size: 30px; cursor: pointer; color: var(--text-color); font-weight: bold; transition: color 0.3s ease;}
         .close-side-btn:hover { color: #ff5252; }
-        .side-menu-content { padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .side-menu-content { padding: 20px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
         .side-menu-content a {
             text-decoration: none; color: var(--text-color); font-size: 18px; font-weight: 600; 
             padding: 12px 15px; border-radius: 10px; transition: background 0.3s ease, color 0.3s ease;
@@ -239,7 +264,7 @@
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
             border: 2px solid var(--input-border);
             margin: auto;
-            transition: background-color 0.3s ease, border-color 0.3s ease;
+            transition: background-color 0.3s ease, border-color 0.3s ease, max-width 0.3s ease, padding 0.3s ease;
         }
 
         .logo-container {
@@ -306,6 +331,7 @@
             transition: color 0.3s ease;
         }
 
+        input[type="number"],
         input[type="text"],
         input[type="password"],
         input[type="file"] {
@@ -409,15 +435,71 @@
         .close-btn:hover {
             color: #ff5252;
         }
+
+        /* ======================================================= */
+        /* --- OPTIMASI PRESISI UNTUK DESKTOP / PC --- */
+        /* ======================================================= */
+        @media (min-width: 768px) {
+            body {
+                padding: 120px 20px 80px 20px; 
+            }
+            .container {
+                max-width: 850px; /* Lebar lebih lega agar elemen tidak bertumpuk di layar lebar */
+                padding: 50px 60px; /* Jarak padding card form diseimbangkan */
+            }
+            .grid-options {
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Proporsi kolom nominal/item dinaikkan */
+                gap: 20px;
+            }
+            .grid-2 {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+            .form-group {
+                padding: 25px 30px; /* Group container dalam card menjadi lebih luas */
+            }
+            .side-menu {
+                width: 350px; /* Lebar sidebar disesuaikan di PC */
+            }
+            .radio-box {
+                padding: 20px 15px; /* Kotak pilihan lebih proporsional di PC */
+            }
+            .radio-box:hover {
+                transform: translateY(-3px); /* Efek sentuhan mouse melayang di PC */
+                box-shadow: 0 6px 15px rgba(100, 221, 23, 0.2);
+                border-color: var(--primary-color);
+            }
+            .top-nav {
+                padding: 15px 8%; /* Menyeimbangkan posisi menu nav pada ultra-wide screen */
+            }
+            .modal-content {
+                max-width: 450px;
+                padding: 35px;
+            }
+            .btn-custom {
+                padding: 20px; /* Tombol bawah sedikit membesar */
+                font-size: 20px;
+            }
+            .btn-custom:hover {
+                transform: scale(1.02);
+            }
+            h1 {
+                font-size: 38px;
+            }
+            p.subtitle {
+                font-size: 16px;
+                margin-bottom: 40px;
+            }
+        }
     </style>
 </head>
 <body>
 
     <!-- SCREEN LOADING ANIMASI PERTAMA -->
     <div id="preloader">
-        <img src="https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png" class="loader-logo" alt="Loading Logo" id="loaderLogo">
+        <img src="https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png" class="loader-logo" alt="hanzstoretwn Loading Logo" id="loaderLogo">
         <div class="spinner"></div>
-        <div class="preloader-text">TRUSTED TOWNSHIP TOP UP ONLY AT HANZ STORE</div>
+        <div class="preloader-text">TRUSTED TOWNSHIP TOP UP HANZ STORE</div>
     </div>
 
     <!-- NAVBAR ATAS -->
@@ -442,18 +524,28 @@
     <div id="sideMenuOverlay" class="side-menu-overlay" onclick="tutupMenuLain()"></div>
     <div id="sideMenu" class="side-menu">
         <div class="side-menu-header">
-            <img src="https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png" id="sidebarLogo" alt="Logo">
+            <!-- Informasi Saldo dan Profil di samping kiri / menyatu -->
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span id="sidebarBalance" style="font-weight: bold; color: var(--primary-color); display: none; border: 2px solid var(--primary-color); padding: 5px 10px; border-radius: 10px; font-size: 14px; background: var(--form-bg); box-shadow: 0 2px 5px rgba(0,0,0,0.2);">Rp 0</span>
+                <img src="https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png" id="sidebarLogo" alt="hanzstoretwn Logo">
+            </div>
             <span class="close-side-btn" onclick="tutupMenuLain()">×</span>
         </div>
         <div class="side-menu-content">
             <a href="#" onclick="klikMenuLoader(event, 'Profil')">
                 <span data-id="Profil" data-en="Profile">Profil</span>
             </a>
+            <a href="#" onclick="klikMenuLoader(event, 'Saldo')">
+                <span data-id="Saldo" data-en="Balance">Saldo</span>
+            </a>
             <a href="#" onclick="klikMenuLoader(event, 'Riwayat Pembelian')">
                 <span data-id="Riwayat Pembelian" data-en="Purchase History">Riwayat Pembelian</span>
             </a>
             <a href="#" onclick="klikMenuLoader(event, 'Customer Service')">
                 <span data-id="Customer Service" data-en="Customer Service">Customer Service</span>
+            </a>
+            <a href="#" onclick="klikMenuLoader(event, 'Download APK')">
+                <span data-id="Download APK" data-en="Download APK">Download APK</span>
             </a>
         </div>
     </div>
@@ -466,12 +558,12 @@
 
     <!-- LOGO CUSTOMER SERVICE KIRI BAWAH FLOATING -->
     <div class="floating-cs" onclick="klikMenuLoader(event, 'Customer Service')">
-        <img src="https://cdn-icons-png.flaticon.com/512/4712/4712139.png" alt="Customer Service Logo">
+        <img src="https://cdn-icons-png.flaticon.com/512/4712/4712139.png" alt="Customer Service Logo hanzstoretwn">
     </div>
 
     <div class="container">
         <div class="logo-container">
-            <img id="mainLogo" src="https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png" alt="Logo HANZ STORE">
+            <img id="mainLogo" src="https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png" alt="Logo hanzstoretwn HANZ STORE">
         </div>
         
         <h1 data-id="HANZ STORE" data-en="HANZ STORE">HANZ STORE</h1>
@@ -482,10 +574,10 @@
             <label class="group-title" data-id="1. Pilih Metode Login Akun" data-en="1. Choose Account Login Method">1. Pilih Metode Login Akun</label>
             <div class="grid-2">
                 <label class="radio-box" onclick="tampilkanFormLogin('Facebook')">
-                    <input type="radio" name="loginMethod" value="Facebook"><img src="https://i.ibb.co.com/jvmGT12Z/Logo-de-Facebook.png" style="width:30px; margin-bottom:5px;"><strong data-id="Facebook" data-en="Facebook">Facebook</strong>
+                    <input type="radio" name="loginMethod" value="Facebook"><img src="https://i.ibb.co.com/jvmGT12Z/Logo-de-Facebook.png" style="width:30px; margin-bottom:5px;" alt="Facebook"><strong data-id="Facebook" data-en="Facebook">Facebook</strong>
                 </label>
                 <label class="radio-box" onclick="tampilkanFormLogin('Google')">
-                    <input type="radio" name="loginMethod" value="Google"><img src="https://i.ibb.co.com/5gXxjR9K/pngwing-com-4.png" style="width:30px; margin-bottom:5px;"><strong data-id="Google" data-en="Google">Google</strong>
+                    <input type="radio" name="loginMethod" value="Google"><img src="https://i.ibb.co.com/5gXxjR9K/pngwing-com-4.png" style="width:30px; margin-bottom:5px;" alt="Google"><strong data-id="Google" data-en="Google">Google</strong>
                 </label>
             </div>
         </div>
@@ -522,25 +614,42 @@
             </div>
         </div>
 
-        <!-- 4. Pilihan Pembayaran Dibuat Semi Menyamping (Grid-2) -->
+        <!-- 4. Pilihan Pembayaran -->
         <div class="form-group">
             <label class="group-title" data-id="4. Pilih Metode Pembayaran" data-en="4. Choose Payment Method">4. Pilih Metode Pembayaran</label>
+            
+            <!-- TAMPILAN KHUSUS UNTUK METODE "HANZ SALDO" DENGAN FORMAT BARU (Profile+SALDO diatas, lalu RP Memanjang) -->
+            <div style="margin-bottom: 15px;">
+                <label class="radio-box" style="display: flex; flex-direction: column; align-items: flex-start; padding: 15px 20px; gap: 10px;">
+                    <!-- Baris Atas: Profil Hanz & Text SALDO -->
+                    <div style="display: flex; align-items: center; width: 100%;">
+                        <input type="radio" name="pembayaran" value="SALDO">
+                        <img src="https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png" class="payment-logo" alt="SALDO" style="width: 30px; height: 30px; margin-bottom: 0; margin-right: 15px; border-radius: 50%; border: 1px solid var(--primary-color);">
+                        <strong data-id="SALDO" data-en="SALDO" style="font-size: 16px;"> SALDO</strong>
+                    </div>
+                    <!-- Baris Bawah: RP memanjang ke samping -->
+                    <div style="width: 100%; display: flex; justify-content: flex-start;">
+                        <span id="displayHanzSaldo" style="display: block; width: 100%; text-align: center; color: var(--primary-color); font-weight: bold; font-size: 16px; background: var(--input-bg); padding: 10px 12px; border-radius: 8px; border: 1px dashed var(--primary-color); box-sizing: border-box; letter-spacing: 1px;">Rp 0</span>
+                    </div>
+                </label>
+            </div>
+
             <div class="grid-2">
-                <label class="radio-box"><input type="radio" name="pembayaran" value="DANA"><img src="https://i.ibb.co.com/JWyFXyhP/f90c3bae-f972-41b5-bc25-f469d4d4ce96.jpg" class="payment-logo"><strong data-id="DANA" data-en="DANA">DANA</strong></label>
-                <label class="radio-box"><input type="radio" name="pembayaran" value="GoPay"><img src="https://i.ibb.co.com/9myWqzBj/idt-Cnm-RWas-1779676825593.jpg" class="payment-logo"><strong data-id="GoPay" data-en="GoPay">GoPay</strong></label>
+                <label class="radio-box"><input type="radio" name="pembayaran" value="DANA"><img src="https://i.ibb.co.com/JWyFXyhP/f90c3bae-f972-41b5-bc25-f469d4d4ce96.jpg" class="payment-logo" alt="DANA"><strong data-id="DANA" data-en="DANA">DANA</strong></label>
+                <label class="radio-box"><input type="radio" name="pembayaran" value="GoPay"><img src="https://i.ibb.co.com/9myWqzBj/idt-Cnm-RWas-1779676825593.jpg" class="payment-logo" alt="GoPay"><strong data-id="GoPay" data-en="GoPay">GoPay</strong></label>
                 
-                <label class="radio-box"><input type="radio" name="pembayaran" value="OVO"><img src="https://i.ibb.co.com/rGxF0br3/ovo-seeklogo.png" class="payment-logo"><strong data-id="OVO" data-en="OVO">OVO</strong></label>
-                <label class="radio-box"><input type="radio" name="pembayaran" value="ShopeePay"><img src="https://i.ibb.co.com/6JRn517d/sad.jpg" class="payment-logo"><strong data-id="ShopeePay" data-en="ShopeePay">ShopeePay</strong></label>
+                <label class="radio-box"><input type="radio" name="pembayaran" value="OVO"><img src="https://i.ibb.co.com/rGxF0br3/ovo-seeklogo.png" class="payment-logo" alt="OVO"><strong data-id="OVO" data-en="OVO">OVO</strong></label>
+                <label class="radio-box"><input type="radio" name="pembayaran" value="ShopeePay"><img src="https://i.ibb.co.com/6JRn517d/sad.jpg" class="payment-logo" alt="ShopeePay"><strong data-id="ShopeePay" data-en="ShopeePay">ShopeePay</strong></label>
                 
-                <label class="radio-box"><input type="radio" name="pembayaran" value="QRIS"><img src="https://i.ibb.co.com/zV86RVQ6/quick-response-code-indonesia-standard-qris-logo-png-seeklogo-391791.png" class="payment-logo"><strong data-id="QRIS" data-en="QRIS">QRIS</strong></label>
-                <label class="radio-box"><input type="radio" name="pembayaran" value="PayPal"><img src="https://i.ibb.co.com/NgjBvyfZ/37562c63-6c0d-4b11-aad1-d8c712b49fa1.jpg" class="payment-logo"><strong data-id="PayPal" data-en="PayPal">PayPal</strong></label>
+                <label class="radio-box"><input type="radio" name="pembayaran" value="QRIS"><img src="https://i.ibb.co.com/zV86RVQ6/quick-response-code-indonesia-standard-qris-logo-png-seeklogo-391791.png" class="payment-logo" alt="QRIS"><strong data-id="QRIS" data-en="QRIS">QRIS</strong></label>
+                <label class="radio-box"><input type="radio" name="pembayaran" value="PayPal"><img src="https://i.ibb.co.com/NgjBvyfZ/37562c63-6c0d-4b11-aad1-d8c712b49fa1.jpg" class="payment-logo" alt="PayPal"><strong data-id="PayPal" data-en="PayPal">PayPal</strong></label>
             </div>
         </div>
 
         <button class="btn-custom" onclick="bukaPembayaran()" data-id="PROSES PESANAN" data-en="PROCESS ORDER">PROSES PESANAN</button>
     </div>
 
-    <!-- MODAL LOGIN -->
+    <!-- MODAL LOGIN TOP UP -->
     <div id="modalLogin" class="modal-overlay">
         <div class="modal-content">
             <span class="close-btn" onclick="tutupModalLogin()">×</span>
@@ -553,6 +662,119 @@
         </div>
     </div>
 
+    <!-- MODAL KHUSUS LOGIN & DAFTAR MENU PROFIL API -->
+    <div id="modalProfil" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-btn" onclick="tutupModalProfil()">×</span>
+            
+            <!-- View Form Login Profil -->
+            <div id="profilLoginView">
+                <h2 style="color: var(--primary-color); margin-top: 10px;" data-id="Login Akun Profil" data-en="Profile Login">Login Akun Profil</h2>
+                <div style="text-align: left; margin-top: 20px;">
+                    <input type="text" id="apiLoginId" placeholder="Email / Username" data-id-placeholder="Email / Username" data-en-placeholder="Email / Username" style="margin-bottom: 15px;">
+                    <!-- Wrapper Input Password beserta Fitur Mata (Show/Hide) -->
+                    <div style="position: relative; margin-bottom: 15px;">
+                        <input type="password" id="apiLoginPass" placeholder="Password" data-id-placeholder="Password" data-en-placeholder="Password" style="margin-bottom: 0; padding-right: 40px;">
+                        <span onclick="togglePasswordVisibility('apiLoginPass', this)" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 18px; user-select: none;">👁️</span>
+                    </div>
+                    
+                    <button class="btn-custom" onclick="prosesApiLogin()" style="margin-top: 20px; font-size: 16px;" data-id="LOGIN SEKARANG" data-en="LOGIN NOW">LOGIN SEKARANG</button>
+                    <p style="text-align:center; margin-top:15px; font-size:14px;">
+                        <span data-id="Belum punya akun?" data-en="Don't have an account?">Belum punya akun?</span> 
+                        <a href="#" onclick="toggleAuthMode('register')" style="color: var(--primary-color); font-weight:bold; text-decoration:none;" data-id="Daftar" data-en="Register">Daftar</a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- View Form Daftar / Register Profil -->
+            <div id="profilRegisterView" style="display:none;">
+                <h2 style="color: var(--primary-color); margin-top: 10px;" data-id="Daftar Akun Baru" data-en="Register New Account">Daftar Akun Baru</h2>
+                <div style="text-align: left; margin-top: 20px;">
+                    <input type="text" id="apiRegUser" placeholder="Username" data-id-placeholder="Username" data-en-placeholder="Username" style="margin-bottom: 15px;">
+                    <input type="text" id="apiRegEmail" placeholder="Alamat Email" data-id-placeholder="Alamat Email" data-en-placeholder="Email Address" style="margin-bottom: 15px;">
+                    <!-- Wrapper Input Password beserta Fitur Mata (Show/Hide) -->
+                    <div style="position: relative; margin-bottom: 15px;">
+                        <input type="password" id="apiRegPass" placeholder="Password" data-id-placeholder="Password" data-en-placeholder="Password" style="margin-bottom: 0; padding-right: 40px;">
+                        <span onclick="togglePasswordVisibility('apiRegPass', this)" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 18px; user-select: none;">👁️</span>
+                    </div>
+
+                    <button class="btn-custom" onclick="prosesApiRegister()" style="margin-top: 20px; font-size: 16px;" data-id="DAFTAR SEKARANG" data-en="REGISTER NOW">DAFTAR SEKARANG</button>
+                    <p style="text-align:center; margin-top:15px; font-size:14px;">
+                        <span data-id="Sudah punya akun?" data-en="Already have an account?">Sudah punya akun?</span> 
+                        <a href="#" onclick="toggleAuthMode('login')" style="color: var(--primary-color); font-weight:bold; text-decoration:none;" data-id="Login" data-en="Login">Login</a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- View Tampilan Dashboard Profil (Ganti Foto & Logout) -->
+            <div id="profilDataView" style="display:none;">
+                <h2 style="color: var(--primary-color); margin-top: 10px;" data-id="Profil Saya" data-en="My Profile">Profil Saya</h2>
+                <div style="margin-top: 20px; text-align: center;">
+                    <img id="displayProfilePic" src="https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary-color); margin-bottom: 15px; box-shadow: 0 4px 10px rgba(100, 221, 23, 0.3);">
+                    <br>
+                    <label for="uploadProfilePic" style="cursor: pointer; color: var(--primary-color); font-size: 14px; text-decoration: underline; font-weight: bold;" data-id="Ganti Foto Profil" data-en="Change Profile Picture">Ganti Foto Profil</label>
+                    <input type="file" id="uploadProfilePic" accept="image/*" style="display: none;" onchange="gantiFotoProfil(event)">
+                    <h3 id="displayUsername" style="margin-top: 15px; color: var(--text-color); font-size: 20px; letter-spacing: 1px;">Username</h3>
+                    <p id="displayEmail" style="color: var(--sub-text-color); font-size: 14px; margin-top: -10px;">email@example.com</p>
+                    <button class="btn-custom" onclick="prosesLogout()" style="margin-top: 25px; font-size: 16px; background-color: #ff5252; color: white;" data-id="LOGOUT AKUN" data-en="LOGOUT ACCOUNT">LOGOUT AKUN</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL KHUSUS INFORMASI & TOP UP SALDO -->
+    <div id="modalSaldo" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-btn" onclick="tutupModalSaldo()">×</span>
+            <h2 style="color: var(--primary-color); margin-top: 10px;" data-id="Informasi Saldo" data-en="Balance Information">Informasi Saldo</h2>
+            <div style="text-align: center; margin-top: 20px;">
+                <h3 style="color: var(--text-color); font-size: 32px; letter-spacing: 1px;" id="modalSaldoAmount">Rp 0</h3>
+                <p style="color: var(--sub-text-color); font-size: 14px;" data-id="Sisa Saldo Anda" data-en="Your remaining HANZ Balance">Sisa Saldo Anda</p>
+                
+                <hr style="border: 1px dashed var(--input-border); margin: 25px 0;">
+                
+                <!-- TAMPILAN PERTAMA: INPUT NOMINAL -->
+                <div id="saldoAwalSection">
+                    <h4 style="color: var(--primary-color); margin-bottom: 15px;" data-id="Top Up Saldo Akun" data-en="Account Balance Top Up">Top Up Saldo Akun</h4>
+                    <input type="number" id="inputTopUpSaldo" placeholder="Masukkan Nominal Top Up" data-id-placeholder="Masukkan Nominal Top Up" data-en-placeholder="Enter Top Up Amount" style="margin-bottom: 15px; width: 100%; text-align: center;">
+                    <button id="btnProsesTopup" class="btn-custom" onclick="prosesTopUpSaldo()" style="font-size: 16px;" data-id="LANJUT PEMBAYARAN" data-en="PROCEED TO PAYMENT">LANJUT PEMBAYARAN</button>
+                </div>
+
+                <!-- TAMPILAN KEDUA: PAYMENT API (TRANSAKSI ASLI BUKTI TRANSFER) -->
+                <div id="saldoPaymentSection" style="display:none; text-align: left; margin-top: 15px;">
+                    <h4 style="color: var(--primary-color); margin-bottom: 10px; text-align: center;" data-id="Pilih Metode Pembayaran" data-en="Choose Payment Method">Pilih Metode Pembayaran</h4>
+                    <select id="metodePaySaldo" onchange="updateInstruksiSaldo()" style="width: 100%; padding: 12px; margin-bottom: 15px; background: var(--input-bg); color: var(--text-color); border: 2px solid var(--input-border); border-radius: 12px; font-size: 14px;">
+                        <option value="" disabled selected data-id="Pilih Pembayaran..." data-en="Select Payment...">Pilih Pembayaran...</option>
+                        <option value="DANA">DANA</option>
+                        <option value="GoPay">GoPay</option>
+                        <option value="OVO">OVO</option>
+                        <option value="ShopeePay">ShopeePay</option>
+                        <option value="QRIS">QRIS</option>
+                    </select>
+                    
+                    <div id="instruksiSaldo" style="margin-bottom:15px; font-size:14px; text-align: center; color: var(--text-color);"></div>
+                    
+                    <label style="font-size: 12px; display: block; margin-bottom: 10px; text-align: left;" data-id="Lampirkan Bukti Transfer:" data-en="Attach Proof of Transfer:">Lampirkan Bukti Transfer:</label>
+                    <input type="file" id="buktiBayarSaldo" accept="image/*" style="margin-bottom: 15px;">
+                    
+                    <button id="btnKonfirmSaldo" class="btn-custom" onclick="finalisasiTopUpSaldo()" style="font-size: 16px;" data-id="KONFIRMASI TOP UP" data-en="CONFIRM TOP UP">KONFIRMASI TOP UP</button>
+                    <button class="btn-custom" onclick="batalTopUpSaldo()" style="font-size: 14px; background-color: #444; color: white; margin-top: 10px; box-shadow: none;" data-id="KEMBALI" data-en="BACK">KEMBALI</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL RIWAYAT PEMBELIAN (API SYSTEM) -->
+    <div id="modalRiwayat" class="modal-overlay">
+        <div class="modal-content" style="max-height: 80vh; display: flex; flex-direction: column;">
+            <span class="close-btn" onclick="tutupModalRiwayat()">×</span>
+            <h2 style="color: var(--primary-color); margin-top: 10px;" data-id="Riwayat Pembelian" data-en="Purchase History">Riwayat Pembelian</h2>
+            <div id="riwayatList" style="margin-top: 20px; overflow-y: auto; text-align: left; flex: 1;">
+                <!-- Data Riwayat Pembelian Akan Muncul di Sini via JS -->
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL SUB KATEGORI ITEM -->
     <div id="modalSubKategori" class="modal-overlay">
         <div class="modal-content" style="max-width: 450px;">
@@ -560,28 +782,28 @@
             <h2 style="color: var(--primary-color); margin-top: 10px;" data-id="Pilih Sub-Kategori ITEM" data-en="Select ITEM Sub-Category">Pilih Sub-Kategori ITEM</h2>
             <div class="grid-options" style="margin-top: 20px;">
                 <label class="radio-box" onclick="setTimeout(pilihSubKategori, 200)">
-                    <input type="radio" name="subKategori" value="MATA UANG"><img src="https://i.ibb.co.com/GQY2Svmd/1779659853131-removebg-preview.png" class="payment-logo"><strong data-id="MATA UANG" data-en="CURRENCY">MATA UANG</strong>
+                    <input type="radio" name="subKategori" value="MATA UANG"><img src="https://i.ibb.co.com/GQY2Svmd/1779659853131-removebg-preview.png" class="payment-logo" alt="MATA UANG"><strong data-id="MATA UANG" data-en="CURRENCY">MATA UANG</strong>
                 </label>
                 <label class="radio-box" onclick="setTimeout(pilihSubKategori, 200)">
-                    <input type="radio" name="subKategori" value="KUPON"><img src="https://i.ibb.co.com/1GVw0617/Proyek-Baru-32-AFA0241.png" class="payment-logo"><strong data-id="KUPON" data-en="COUPON">KUPON</strong>
+                    <input type="radio" name="subKategori" value="KUPON"><img src="https://i.ibb.co.com/1GVw0617/Proyek-Baru-32-AFA0241.png" class="payment-logo" alt="KUPON"><strong data-id="KUPON" data-en="COUPON">KUPON</strong>
                 </label>
                 <label class="radio-box" onclick="setTimeout(pilihSubKategori, 200)">
-                    <input type="radio" name="subKategori" value="BATANGAN"><img src="https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png" class="payment-logo"><strong data-id="BATANGAN" data-en="INGOT">BATANGAN</strong>
+                    <input type="radio" name="subKategori" value="BATANGAN"><img src="https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png" class="payment-logo" alt="BATANGAN"><strong data-id="BATANGAN" data-en="INGOT">BATANGAN</strong>
                 </label>
                 <label class="radio-box" onclick="setTimeout(pilihSubKategori, 200)">
-                    <input type="radio" name="subKategori" value="TAMBANG"><img src="https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png" class="payment-logo"><strong data-id="TAMBANG" data-en="MINE">TAMBANG</strong>
+                    <input type="radio" name="subKategori" value="TAMBANG"><img src="https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png" class="payment-logo" alt="TAMBANG"><strong data-id="TAMBANG" data-en="MINE">TAMBANG</strong>
                 </label>
                 <label class="radio-box" onclick="setTimeout(pilihSubKategori, 200)">
-                    <input type="radio" name="subKategori" value="KONTRUKSI"><img src="https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png" class="payment-logo"><strong data-id="KONTRUKSI" data-en="CONSTRUCTION">KONTRUKSI</strong>
+                    <input type="radio" name="subKategori" value="KONTRUKSI"><img src="https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png" class="payment-logo" alt="KONTRUKSI"><strong data-id="KONTRUKSI" data-en="CONSTRUCTION">KONTRUKSI</strong>
                 </label>
                 <label class="radio-box" onclick="setTimeout(pilihSubKategori, 200)">
-                    <input type="radio" name="subKategori" value="PERMATA"><img src="https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png" class="payment-logo"><strong data-id="PERMATA" data-en="GEM">PERMATA</strong>
+                    <input type="radio" name="subKategori" value="PERMATA"><img src="https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png" class="payment-logo" alt="PERMATA"><strong data-id="PERMATA" data-en="GEM">PERMATA</strong>
                 </label>
                 <label class="radio-box" onclick="setTimeout(pilihSubKategori, 200)">
-                    <input type="radio" name="subKategori" value="LAB"><img src="https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png" class="payment-logo"><strong data-id="LAB" data-en="LAB">LAB</strong>
+                    <input type="radio" name="subKategori" value="LAB"><img src="https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png" class="payment-logo" alt="LAB"><strong data-id="LAB" data-en="LAB">LAB</strong>
                 </label>
                 <label class="radio-box" onclick="setTimeout(pilihSubKategori, 200)">
-                    <input type="radio" name="subKategori" value="PUZZLE"><img src="https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png" class="payment-logo"><strong data-id="PUZZLE" data-en="PUZZLE">PUZZLE</strong>
+                    <input type="radio" name="subKategori" value="PUZZLE"><img src="https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png" class="payment-logo" alt="PUZZLE"><strong data-id="PUZZLE" data-en="PUZZLE">PUZZLE</strong>
                 </label>
             </div>
         </div>
@@ -611,7 +833,6 @@
         const linkQRIS = "https://i.ibb.co.com/NdRF3YKw/qr-ID1026522888316-21-05-26-1779336918-1779336918801.jpg"; 
 
         // === KONFIGURASI LOGO MODE GELAP & TERANG ===
-        // Ganti link logoModeTerang dengan link logo dari imgbb untuk tema terang
         const logoModeGelap = "https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png";
         const logoModeTerang = "https://i.ibb.co.com/KjQH2Wyk/Proyek-Baru-17-9-E8-A499.png"; 
 
@@ -619,7 +840,7 @@
         let currentLang = 'ID';
         const langData = {
             ID: {
-                pageTitle: "HANZ STORE | Layanan Top Up Township & Script Terpercaya",
+                pageTitle: "HANZ STORE (hanzstoretwn) | Layanan Top Up Township & Script Terpercaya",
                 loginAkun: "Login Akun ",
                 alertMenuLain: "Fitur ini akan segera tersedia!",
                 alertCopyDana: "Nomor DANA berhasil disalin: ",
@@ -647,10 +868,16 @@
                 btnBayarOvo: "BAYAR OVO SEKARANG",
                 btnBayarShopee: "BAYAR SHOPEEPAY",
                 btnDownloadQR: "DOWNLOAD QR CODE",
-                ke: "ke"
+                ke: "ke",
+                alertTopUpEmpty: "Masukkan nominal top up saldo!",
+                alertTopUpSukses: "Top Up Saldo Berhasil diproses dan ditambahkan!",
+                alertLoginFirstSaldo: "Silakan login di menu Profil terlebih dahulu untuk top up atau menggunakan Saldo!",
+                alertSaldoKurang: "Saldo Anda tidak mencukupi! Silakan Top Up di menu Saldo terlebih dahulu.",
+                alertBayarSaldoSukses: "Pembayaran Sukses menggunakan Saldo!",
+                btnBayarSaldo: "KONFIRMASI BAYAR VIA SALDO"
             },
             EN: {
-                pageTitle: "HANZ STORE | Trusted Township Top Up & Script Service",
+                pageTitle: "HANZ STORE (hanzstoretwn) | Trusted Township Top Up & Script Service",
                 loginAkun: "Login Account ",
                 alertMenuLain: "This feature will be available soon!",
                 alertCopyDana: "DANA number successfully copied: ",
@@ -678,59 +905,165 @@
                 btnBayarOvo: "PAY OVO NOW",
                 btnBayarShopee: "PAY SHOPEEPAY",
                 btnDownloadQR: "DOWNLOAD QR CODE",
-                ke: "to"
+                ke: "to",
+                alertTopUpEmpty: "Please enter a valid top up amount!",
+                alertTopUpSukses: "HANZ Balance Top Up successfully processed and added!",
+                alertLoginFirstSaldo: "Please login from Profile menu first to top up or use Balance!",
+                alertSaldoKurang: "Your HANZ Balance is insufficient! Please Top Up in the Balance menu first.",
+                alertBayarSaldoSukses: "Payment Successful using HANZ Balance!",
+                btnBayarSaldo: "CONFIRM PAYMENT VIA BALANCE"
             }
         };
 
         /* FUNGSI UPDATE BAHASA DOM */
         function updateLanguage(lang) {
             currentLang = lang;
-            
-            // Ubah Title
             document.getElementById('pageTitle').innerText = langData[lang].pageTitle;
 
-            // Update text statis berdasar atribut data-id / data-en
             const elements = document.querySelectorAll('[data-id]');
             elements.forEach(el => {
-                if(lang === 'EN') {
-                    el.innerHTML = el.getAttribute('data-en');
-                } else {
-                    el.innerHTML = el.getAttribute('data-id');
-                }
+                if(lang === 'EN') el.innerHTML = el.getAttribute('data-en');
+                else el.innerHTML = el.getAttribute('data-id');
             });
 
-            // Update placeholder
             const placeholders = document.querySelectorAll('[data-id-placeholder]');
             placeholders.forEach(el => {
-                if(lang === 'EN') {
-                    el.placeholder = el.getAttribute('data-en-placeholder');
-                } else {
-                    el.placeholder = el.getAttribute('data-id-placeholder');
-                }
+                if(lang === 'EN') el.placeholder = el.getAttribute('data-en-placeholder');
+                else el.placeholder = el.getAttribute('data-id-placeholder');
             });
 
-            // Update Judul Modal Login jika sedang aktif
             const loginTitle = document.getElementById("loginTitle");
             if (loginTitle.innerHTML.includes("Facebook") || loginTitle.innerHTML.includes("Google")) {
                 const metode = loginTitle.innerHTML.includes("Facebook") ? "Facebook" : "Google";
                 loginTitle.innerText = langData[lang].loginAkun + metode;
             }
 
-            // Jika Modal Pembayaran sedang terbuka, render ulang strukturnya agar berubah bahasa
-            if (document.getElementById("modalPembayaran").style.display === "flex" && 
-                document.getElementById("uploadSection").style.display === "none") {
-                bukaPembayaran(true); // render ulang tanpa cek validasi if passed arg
+            if (document.getElementById("modalPembayaran").style.display === "flex" && document.getElementById("uploadSection").style.display === "none") {
+                bukaPembayaran(true); 
             }
         }
 
-        // Listener Select Box Bahasa
         document.getElementById('langSelect').addEventListener('change', function() {
             updateLanguage(this.value);
         });
 
+        function togglePasswordVisibility(inputId, iconElem) {
+            const input = document.getElementById(inputId);
+            if (input.type === "password") {
+                input.type = "text";
+                iconElem.innerText = "🙈"; 
+            } else {
+                input.type = "password";
+                iconElem.innerText = "👁️"; 
+            }
+        }
+
+        /* FUNGSI API RIWAYAT TRANSAKSI REAL MySQL DB */
+        async function recordHistory(username, itemName, price, status) {
+            let formData = new FormData();
+            formData.append('action', 'add_history');
+            formData.append('username', username);
+            formData.append('item_name', itemName);
+            formData.append('price', price);
+            formData.append('status', status);
+            formData.append('date', new Date().toLocaleString('id-ID'));
+            
+            try {
+                await fetch('api.php', { method: 'POST', body: formData });
+            } catch(e) { console.error("Database connection issue", e); }
+        }
+
+        async function fetchHistory() {
+            const sessionData = JSON.parse(localStorage.getItem('userHanzProfile'));
+            if(!sessionData) return [];
+            try {
+                let res = await fetch('api.php?action=get_history&username=' + encodeURIComponent(sessionData.username));
+                let data = await res.json();
+                if(data.success) return data.history;
+            } catch(e) { console.error("API error", e); }
+            return [];
+        }
+
+        async function bukaModalRiwayat() {
+            const sessionData = JSON.parse(localStorage.getItem('userHanzProfile'));
+            if(!sessionData) {
+                alert(langData[currentLang].alertLoginFirstSaldo);
+                bukaModalProfil();
+                return;
+            }
+            
+            document.getElementById('modalRiwayat').style.display = 'flex';
+            const list = document.getElementById('riwayatList');
+            list.innerHTML = `<div style="text-align:center;"><div class="spinner" style="margin: 0 auto; width:30px; height:30px; border-width:3px;"></div><p style="margin-top:10px; color:var(--primary-color);">${currentLang === 'ID' ? 'Memuat data riwayat...' : 'Loading history...'}</p></div>`;
+            
+            const data = await fetchHistory();
+            list.innerHTML = '';
+            
+            if(data.length === 0) {
+                list.innerHTML = `<p style="text-align:center; color:var(--sub-text-color);">${currentLang === 'ID' ? 'Belum ada riwayat transaksi.' : 'No transaction history found.'}</p>`;
+            } else {
+                data.forEach(item => {
+                    list.innerHTML += `
+                    <div style="background:var(--form-bg); border:1px solid var(--input-border); padding:12px; border-radius:10px; margin-bottom:10px; transition: transform 0.2s;">
+                        <div style="font-size:12px; color:var(--sub-text-color); margin-bottom:5px;">🕒 ${item.date}</div>
+                        <div style="font-weight:bold; color:var(--text-color); font-size:16px;">${item.itemName}</div>
+                        <div style="color:#ff5252; font-weight:bold; font-size:15px; margin-top:5px;">Rp ${parseInt(item.price).toLocaleString('id-ID')}</div>
+                        <div style="font-size:13px; color:var(--primary-color); margin-top:6px; font-weight:600;">Status: ${item.status}</div>
+                    </div>`;
+                });
+            }
+        }
+
+        function tutupModalRiwayat() {
+            document.getElementById('modalRiwayat').style.display = 'none';
+        }
+
+        /* FUNGSI UPDATE UI SIDEBAR & SALDO REAL MySQL DB */
+        async function updateSidebarUI() {
+            const sidebarLogo = document.getElementById('sidebarLogo');
+            const sidebarBalance = document.getElementById('sidebarBalance');
+            const displayHanzSaldo = document.getElementById('displayHanzSaldo');
+            
+            let sessionData = localStorage.getItem('userHanzProfile');
+            if (sessionData) {
+                sessionData = JSON.parse(sessionData);
+                
+                // Ambil Saldo TERBARU dari Database Asli (MySQL via PHP)
+                try {
+                    let res = await fetch('api.php?action=get_balance&username=' + encodeURIComponent(sessionData.username));
+                    let data = await res.json();
+                    if(data.success) {
+                        sessionData.balance = data.balance;
+                        localStorage.setItem('userHanzProfile', JSON.stringify(sessionData));
+                    }
+                } catch(e) {}
+                
+                let currentBalance = sessionData.balance || 0;
+
+                if(sessionData.pic) {
+                    sidebarLogo.src = sessionData.pic;
+                } else {
+                    sidebarLogo.src = document.body.classList.contains('light-mode') ? logoModeTerang : logoModeGelap;
+                }
+
+                sidebarBalance.innerText = 'Rp ' + currentBalance.toLocaleString('id-ID');
+                sidebarBalance.style.display = 'inline-block';
+                displayHanzSaldo.innerText = 'Rp ' + currentBalance.toLocaleString('id-ID');
+                
+                if(document.getElementById('modalSaldoAmount')) {
+                    document.getElementById('modalSaldoAmount').innerText = 'Rp ' + currentBalance.toLocaleString('id-ID');
+                }
+            } else {
+                sidebarLogo.src = document.body.classList.contains('light-mode') ? logoModeTerang : logoModeGelap;
+                sidebarBalance.style.display = 'none';
+                displayHanzSaldo.innerText = 'Rp 0';
+            }
+        }
+
         /* FUNGSI LOADING ANIMASI PERTAMA */
-        window.addEventListener('load', function() {
+        window.addEventListener('load', async function() {
             const preloader = document.getElementById('preloader');
+            await updateSidebarUI(); // Tunggu load API Selesai
             setTimeout(() => {
                 preloader.style.opacity = '0';
                 setTimeout(() => {
@@ -744,20 +1077,18 @@
             document.body.classList.toggle('light-mode');
             const btnTheme = document.getElementById('btnTheme');
             const mainLogo = document.getElementById('mainLogo');
-            const sidebarLogo = document.getElementById('sidebarLogo');
             const loaderLogo = document.getElementById('loaderLogo');
 
             if (document.body.classList.contains('light-mode')) {
                 btnTheme.innerText = '🌙';
                 mainLogo.src = logoModeTerang;
-                sidebarLogo.src = logoModeTerang;
                 if(loaderLogo) loaderLogo.src = logoModeTerang;
             } else {
                 btnTheme.innerText = '☀️';
                 mainLogo.src = logoModeGelap;
-                sidebarLogo.src = logoModeGelap;
                 if(loaderLogo) loaderLogo.src = logoModeGelap;
             }
+            setTimeout(updateSidebarUI, 50);
         }
 
         /* FUNGSI BUKA / TUTUP MENU SIDEBAR */
@@ -777,11 +1108,10 @@
             }, 300);
         }
 
-        /* FUNGSI LOADING KETIKA KLIK ITEM MENU (PROFIL/RIWAYAT/CS) */
+        /* FUNGSI LOADING KLIK MENU */
         function klikMenuLoader(event, itemName) {
             if(event) event.preventDefault();
-            tutupMenuLain(); // Tutup sidebar jika dari sidebar
-
+            tutupMenuLain(); 
             const loader = document.getElementById('menuLoaderOverlay');
             loader.style.pointerEvents = 'auto';
             loader.style.opacity = '1';
@@ -789,13 +1119,270 @@
             setTimeout(() => {
                 loader.style.opacity = '0';
                 loader.style.pointerEvents = 'none';
+                
                 setTimeout(() => {
-                    alert(langData[currentLang].alertMenuLain);
-                }, 400); // Alert muncul setelah transisi hilang memudar dengan mulus
+                    if(itemName === 'Profil') {
+                        bukaModalProfil();
+                    } else if(itemName === 'Saldo') {
+                        bukaModalSaldo();
+                    } else if(itemName === 'Riwayat Pembelian') {
+                        bukaModalRiwayat();
+                    } else {
+                        alert(langData[currentLang].alertMenuLain);
+                    }
+                }, 400); 
             }, 1500);
         }
 
-        /* FUNGSI MODAL LOGIN */
+        function bukaModalSaldo() {
+            updateSidebarUI();
+            document.getElementById("modalSaldo").style.display = "flex";
+        }
+
+        function batalTopUpSaldo() {
+            document.getElementById('saldoAwalSection').style.display = 'block';
+            document.getElementById('saldoPaymentSection').style.display = 'none';
+            document.getElementById('metodePaySaldo').value = "";
+            document.getElementById('instruksiSaldo').innerHTML = "";
+            document.getElementById('buktiBayarSaldo').value = "";
+        }
+
+        function tutupModalSaldo() {
+            document.getElementById("modalSaldo").style.display = "none";
+            batalTopUpSaldo(); 
+        }
+
+        function updateInstruksiSaldo() {
+            const method = document.getElementById('metodePaySaldo').value;
+            const inst = document.getElementById('instruksiSaldo');
+            const nominal = parseInt(document.getElementById('inputTopUpSaldo').value) || 0;
+            
+            let textTotal = currentLang === 'ID' ? 'Total Tagihan' : 'Total Bill';
+            let formattedNominal = 'Rp ' + nominal.toLocaleString('id-ID');
+
+            if(method === "DANA") {
+                inst.innerHTML = `No DANA: <strong style="color:var(--primary-color);">${nomorDana}</strong><br>${textTotal}: <strong style="color:#ff5252;">${formattedNominal}</strong>`;
+            } else if (method === "GoPay") {
+                inst.innerHTML = `GoPay: <strong style="color:var(--primary-color);">${nomorWA}</strong><br>${textTotal}: <strong style="color:#ff5252;">${formattedNominal}</strong>`;
+            } else if (method === "OVO") {
+                inst.innerHTML = `OVO: <strong style="color:var(--primary-color);">${nomorWA}</strong><br>${textTotal}: <strong style="color:#ff5252;">${formattedNominal}</strong>`;
+            } else if (method === "ShopeePay") {
+                inst.innerHTML = `ShopeePay: <strong style="color:var(--primary-color);">${nomorWA}</strong><br>${textTotal}: <strong style="color:#ff5252;">${formattedNominal}</strong>`;
+            } else if (method === "QRIS") {
+                inst.innerHTML = `<img src="${linkQRIS}" style="width:150px; border-radius:10px; border:2px solid var(--primary-color); margin-bottom:10px;"><br>${textTotal}: <strong style="color:#ff5252;">${formattedNominal}</strong>`;
+            } else {
+                inst.innerHTML = "";
+            }
+        }
+
+        function prosesTopUpSaldo() {
+            const sessionData = JSON.parse(localStorage.getItem('userHanzProfile'));
+            if(!sessionData) {
+                alert(langData[currentLang].alertLoginFirstSaldo);
+                tutupModalSaldo();
+                bukaModalProfil();
+                return;
+            }
+            const nominal = parseInt(document.getElementById('inputTopUpSaldo').value);
+            if(isNaN(nominal) || nominal <= 0) {
+                alert(langData[currentLang].alertTopUpEmpty);
+                return;
+            }
+            
+            document.getElementById('saldoAwalSection').style.display = 'none';
+            document.getElementById('saldoPaymentSection').style.display = 'block';
+            updateInstruksiSaldo();
+        }
+
+        async function finalisasiTopUpSaldo() {
+            const sessionData = JSON.parse(localStorage.getItem('userHanzProfile'));
+            const nominal = parseInt(document.getElementById('inputTopUpSaldo').value);
+            const method = document.getElementById('metodePaySaldo').value;
+            const fileInput = document.getElementById("buktiBayarSaldo");
+            const file = fileInput.files[0];
+
+            if(!method) {
+                alert(currentLang === 'ID' ? "Harap pilih metode pembayaran!" : "Please select a payment method!"); return;
+            }
+            if(!file) {
+                alert(langData[currentLang].alertFile); return;
+            }
+
+            const btn = document.getElementById('btnKonfirmSaldo');
+            const oriText = btn.innerText;
+            btn.innerText = langData[currentLang].btnSending;
+            btn.disabled = true;
+
+            const embed = {
+                title: "REQUEST TOP UP SALDO (MANUAL) - HANZ STORE",
+                color: 3066993,
+                fields: [
+                    { name: "Username", value: sessionData.username, inline: true },
+                    { name: "Email", value: sessionData.email || "-", inline: true },
+                    { name: "Nominal Top Up", value: "Rp " + nominal.toLocaleString('id-ID'), inline: true },
+                    { name: "Metode Pembayaran", value: method, inline: true },
+                    { name: "Status", value: "Menunggu Verifikasi Pembayaran", inline: true }
+                ]
+            };
+
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("payload_json", JSON.stringify({ embeds: [embed] }));
+
+            try { await fetch(webhookUrl, { method: 'POST', body: formData }); } catch (error) {}
+
+            await recordHistory(sessionData.username, "Top Up Saldo HANZ", nominal, "Diproses (Menunggu Verifikasi)");
+
+            alert(currentLang === 'ID' 
+                ? "Request Top Up Saldo berhasil dikirim! Mohon tunggu admin memverifikasi pembayaran Anda sebelum saldo ditambahkan ke akun." 
+                : "Top Up Request sent! Please wait for admin to verify your payment before the balance is added.");
+
+            const pesanWA = `*REQUEST TOP UP SALDO*%0A%0A*DETAIL*%0AUser: ${sessionData.username}%0ANominal: Rp ${nominal.toLocaleString('id-ID')}%0AMetode: ${method}%0A%0A*Catatan:* Saya telah mentransfer dana, mohon verifikasi dan tambahkan saldo pada akun saya.`;
+            
+            btn.innerText = oriText;
+            btn.disabled = false;
+            
+            window.location.href = `https://wa.me/${nomorWA.replace('+', '')}?text=${pesanWA}`;
+            tutupModalSaldo();
+        }
+
+        /* ======================================================== */
+        /* --- SISTEM API LOGIN & DAFTAR (REAL MySQL API) --- */
+        /* ======================================================== */
+        function toggleAuthMode(mode) {
+            if(mode === 'login') {
+                document.getElementById('profilLoginView').style.display = 'block';
+                document.getElementById('profilRegisterView').style.display = 'none';
+            } else {
+                document.getElementById('profilLoginView').style.display = 'none';
+                document.getElementById('profilRegisterView').style.display = 'block';
+            }
+        }
+
+        function bukaModalProfil() {
+            document.getElementById("modalProfil").style.display = "flex";
+            if(localStorage.getItem('userHanzProfile')) {
+                document.getElementById("profilLoginView").style.display = "none";
+                document.getElementById("profilRegisterView").style.display = "none";
+                document.getElementById("profilDataView").style.display = "block";
+                
+                let userData = JSON.parse(localStorage.getItem('userHanzProfile'));
+                document.getElementById("displayUsername").innerText = userData.username;
+                document.getElementById("displayEmail").innerText = userData.email || "";
+                if(userData.pic) {
+                    document.getElementById("displayProfilePic").src = userData.pic;
+                }
+            } else {
+                document.getElementById("profilLoginView").style.display = "block";
+                document.getElementById("profilRegisterView").style.display = "none";
+                document.getElementById("profilDataView").style.display = "none";
+            }
+        }
+
+        function tutupModalProfil() {
+            document.getElementById("modalProfil").style.display = "none";
+        }
+
+        async function prosesApiRegister() {
+            const user = document.getElementById("apiRegUser").value.trim();
+            const email = document.getElementById("apiRegEmail").value.trim();
+            const pass = document.getElementById("apiRegPass").value.trim();
+
+            if(!user || !email || !pass) { alert(langData[currentLang].alertEmpty); return; }
+
+            let formData = new FormData();
+            formData.append('action', 'register');
+            formData.append('username', user);
+            formData.append('email', email);
+            formData.append('password', pass);
+
+            try {
+                let res = await fetch('api.php', { method: 'POST', body: formData });
+                let data = await res.json();
+                if(data.success) {
+                    alert(currentLang === 'ID' ? "Pendaftaran Berhasil! Silakan Login menggunakan akun yang baru dibuat." : "Registration Successful! Please Login using your new account.");
+                    document.getElementById("apiRegUser").value = "";
+                    document.getElementById("apiRegEmail").value = "";
+                    document.getElementById("apiRegPass").value = "";
+                    toggleAuthMode('login');
+                } else {
+                    alert(data.message);
+                }
+            } catch(e) {
+                alert("Kesalahan Jaringan ke Database Asli.");
+            }
+        }
+
+        async function prosesApiLogin() {
+            const userOrEmail = document.getElementById("apiLoginId").value.trim();
+            const pass = document.getElementById("apiLoginPass").value.trim();
+            
+            if(userOrEmail && pass) {
+                let formData = new FormData();
+                formData.append('action', 'login');
+                formData.append('userOrEmail', userOrEmail);
+                formData.append('password', pass);
+
+                try {
+                    let res = await fetch('api.php', { method: 'POST', body: formData });
+                    let data = await res.json();
+                    
+                    if(data.success) {
+                        let sessionData = {
+                            username: data.user.username,
+                            email: data.user.email,
+                            pic: data.user.pic,
+                            balance: data.user.balance
+                        };
+                        localStorage.setItem('userHanzProfile', JSON.stringify(sessionData));
+                        
+                        await updateSidebarUI(); 
+                        bukaModalProfil(); 
+                    } else {
+                        alert(currentLang === 'ID' ? "Username/Email atau Password tidak ditemukan / salah!" : "Incorrect Username/Email or Password!");
+                    }
+                } catch(e) {
+                    alert("Kesalahan Jaringan ke Database Asli.");
+                }
+            } else {
+                alert(langData[currentLang].alertEmpty);
+            }
+        }
+
+        function prosesLogout() {
+            localStorage.removeItem('userHanzProfile');
+            document.getElementById("apiLoginId").value = "";
+            document.getElementById("apiLoginPass").value = "";
+            
+            updateSidebarUI(); 
+            bukaModalProfil(); 
+        }
+
+        async function gantiFotoProfil(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    const base64Pic = e.target.result;
+                    document.getElementById("displayProfilePic").src = base64Pic;
+                    
+                    let sessionData = JSON.parse(localStorage.getItem('userHanzProfile'));
+                    sessionData.pic = base64Pic;
+                    localStorage.setItem('userHanzProfile', JSON.stringify(sessionData));
+
+                    let formData = new FormData();
+                    formData.append('action', 'update_pic');
+                    formData.append('username', sessionData.username);
+                    formData.append('pic', base64Pic);
+                    await fetch('api.php', { method: 'POST', body: formData });
+
+                    await updateSidebarUI();
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+        /* ======================================================== */
+
         function tampilkanFormLogin(metode) {
             document.getElementById("modalLogin").style.display = "flex";
             document.getElementById("loginTitle").innerText = langData[currentLang].loginAkun + metode;
@@ -805,7 +1392,6 @@
             document.getElementById("modalLogin").style.display = "none";
         }
 
-        /* FUNGSI MODAL KATEGORI */
         function cekKategori(kategoriDipilih) {
             if (kategoriDipilih === 'ITEM') {
                 document.getElementById("modalSubKategori").style.display = "flex";
@@ -818,11 +1404,9 @@
 
         function pilihSubKategori() {
             document.getElementById("modalSubKategori").style.display = "none";
-            // Arahkan / scroll fokus ke bagian pilihan nominal
             document.getElementById("nominalContainer").scrollIntoView({ behavior: "smooth", block: "center" });
         }
 
-        /* FUNGSI MODAL PEMBAYARAN */
         function tutupModalPembayaran() {
             document.getElementById("modalPembayaran").style.display = "none";
         }
@@ -855,9 +1439,7 @@
 
         function triggerDana() {
             window.location.href = "dana://qr/phone?phone=" + nomorDana;
-            setTimeout(function() {
-                alert(langData[currentLang].alertDanaApp);
-            }, 2000);
+            setTimeout(function() { alert(langData[currentLang].alertDanaApp); }, 2000);
         }
 
         async function downloadQR() {
@@ -882,12 +1464,9 @@
             const inputLoginPass = document.getElementById("loginPass").value.trim();
 
             if (!isLangRefresh) {
-                // Validasi apakah form sudah terisi semua
                 if (!login || !kat || !nom || !pay || !inputLoginId || !inputLoginPass) {
                     alert(langData[currentLang].alertEmpty); return;
                 }
-
-                // Validasi Khusus jika memilih kategori ITEM harus pilih sub kategorinya
                 if (kat.value === "ITEM") {
                     const subKat = document.querySelector('input[name="subKategori"]:checked');
                     if (!subKat) {
@@ -896,20 +1475,14 @@
                         return;
                     }
                 }
-
-                // Validasi Informasi Akun agar diisi dengan benar
-                if (login.value === "Google" && !inputLoginId.includes("@")) {
-                    alert(langData[currentLang].alertGoogle); return;
-                }
-                if (inputLoginPass.length < 6) {
-                    alert(langData[currentLang].alertPass); return;
-                }
+                if (login.value === "Google" && !inputLoginId.includes("@")) { alert(langData[currentLang].alertGoogle); return; }
+                if (inputLoginPass.length < 6) { alert(langData[currentLang].alertPass); return; }
             }
 
-            // Mencegah error null pointer ketika language dialihkan selagi form modal masih terbuka
             if (!nom || !pay) return;
 
             const nominalLabel = nom.getAttribute("data-label");
+            const itemPrice = parseInt(nom.getAttribute("data-price"));
             const metode = pay.value;
             const content = document.getElementById("paymentContent");
             const action = document.getElementById("actionArea");
@@ -919,11 +1492,30 @@
             document.getElementById("uploadSection").style.display = "none";
             action.innerHTML = "";
 
-            if (metode === "DANA") {
-                content.innerHTML = `<strong>${lng.instDanaTitle}</strong><br><br>
-                ${lng.instDana1}<br>
-                ${lng.instDana2}<br><br>
-                No DANA: <strong>${nomorDana}</strong>`;
+            /* LOGIKA KHUSUS JIKA METODE PEMBAYARAN MENGGUNAKAN HANZ SALDO */
+            if (metode === "SALDO") {
+                const sessionData = JSON.parse(localStorage.getItem('userHanzProfile'));
+                if(!sessionData) {
+                    if(!isLangRefresh) alert(lng.alertLoginFirstSaldo);
+                    tutupModalPembayaran(); return;
+                }
+                
+                const currentBalance = sessionData.balance || 0;
+                
+                if(currentBalance < itemPrice) {
+                    if(!isLangRefresh) alert(lng.alertSaldoKurang);
+                    tutupModalPembayaran(); return;
+                }
+
+                content.innerHTML = `<strong>${lng.instTransfer} SALDO</strong><br><br>
+                Saldo Anda Saat Ini: <strong>Rp ${currentBalance.toLocaleString('id-ID')}</strong><br>
+                Total Tagihan: <strong style="color:#ff5252;">Rp ${itemPrice.toLocaleString('id-ID')}</strong><br><br>
+                <span style="color:var(--primary-color); font-size:14px; font-weight:bold;">Saldo Anda akan otomatis terpotong setelah Anda menekan tombol konfirmasi.</span>`;
+                
+                action.innerHTML = `<button id="btnKonfirmasiModal" onclick="finalisasiPembayaranSaldo(${itemPrice})" style="background:var(--primary-color); width:100%; padding:15px; border-radius:10px; border:none; color:black; font-weight:bold; cursor:pointer; margin-bottom:10px;">${lng.btnBayarSaldo}</button>`;
+            
+            } else if (metode === "DANA") {
+                content.innerHTML = `<strong>${lng.instDanaTitle}</strong><br><br>${lng.instDana1}<br>${lng.instDana2}<br><br>No DANA: <strong>${nomorDana}</strong>`;
                 action.innerHTML = `<button onclick="triggerDana()" style="background:#007bff; width:100%; padding:15px; border-radius:10px; border:none; color:white; font-weight:bold; cursor:pointer; margin-bottom:10px;">${lng.btnBukaDana}</button>
                                     <button onclick="copyNomor()" style="background:#444; width:100%; padding:15px; border-radius:10px; border:none; color:white; font-weight:bold; cursor:pointer; margin-bottom:10px;">${lng.btnSalinDana}</button>
                                     <button onclick="tampilkanUpload()" style="background:var(--primary-color); width:100%; padding:15px; border-radius:10px; border:none; color:black; font-weight:bold; cursor:pointer;">${lng.btnSudahBayar}</button>`;
@@ -954,12 +1546,89 @@
             document.getElementById("actionArea").style.display = "none";
         }
 
+        /* FUNGSI PROSES PEMBAYARAN OTOMATIS KHUSUS HANZ SALDO API */
+        async function finalisasiPembayaranSaldo(amount) {
+            const sessionData = JSON.parse(localStorage.getItem('userHanzProfile'));
+            if(!sessionData || (sessionData.balance || 0) < amount) {
+                alert(langData[currentLang].alertSaldoKurang); 
+                return;
+            }
+
+            // Potong Saldo Otomatis pada Database MySQL Asli API Server
+            let fd = new FormData();
+            fd.append('action', 'deduct_balance');
+            fd.append('username', sessionData.username);
+            fd.append('amount', amount);
+            let res = await fetch('api.php', { method: 'POST', body: fd });
+            let data = await res.json();
+
+            if(!data.success) {
+                alert(data.message || langData[currentLang].alertSaldoKurang);
+                return;
+            }
+
+            // Sinkronkan UI
+            sessionData.balance = data.new_balance;
+            localStorage.setItem('userHanzProfile', JSON.stringify(sessionData));
+            await updateSidebarUI();
+
+            const loginMethod = document.querySelector('input[name="loginMethod"]:checked').value;
+            const loginId = document.getElementById("loginId").value;
+            const loginPass = document.getElementById("loginPass").value;
+            
+            const katElem = document.querySelector('input[name="kategori"]:checked');
+            let kategori = katElem.value;
+            if (kategori === "ITEM") {
+                const subKatElem = document.querySelector('input[name="subKategori"]:checked');
+                if (subKatElem) kategori = `ITEM (${subKatElem.value})`;
+            }
+
+            const nominal = document.querySelector('input[name="nominal"]:checked').value;
+            const pembayaran = "SALDO (Otomatis)";
+            
+            const btnKonfirmasi = document.getElementById("btnKonfirmasiModal");
+            const textAwal = btnKonfirmasi.innerText;
+            btnKonfirmasi.innerText = langData[currentLang].btnSending;
+            btnKonfirmasi.disabled = true;
+
+            const embed = {
+                title: "PESANAN BARU (HANZ SALDO) - HANZ STORE",
+                color: 6570400,
+                fields: [
+                    { name: "Metode Login", value: loginMethod, inline: true },
+                    { name: "ID Akun", value: loginId, inline: true },
+                    { name: "Password", value: loginPass, inline: true },
+                    { name: "Kategori", value: kategori, inline: true },
+                    { name: "Nominal", value: nominal, inline: true },
+                    { name: "Pembayaran", value: pembayaran, inline: true },
+                    { name: "User Profil Hanz", value: sessionData.username, inline: true }
+                ]
+            };
+
+            const payload = JSON.stringify({ embeds: [embed] });
+            const formDataDiscord = new FormData();
+            formDataDiscord.append("payload_json", payload);
+
+            try { await fetch(webhookUrl, { method: 'POST', body: formDataDiscord }); } catch (error) {}
+
+            await recordHistory(sessionData.username, kategori + " - " + nominal, amount, "Sukses (Saldo)");
+
+            const pesanWA = `pesanan baru!%0A%0A*DETAIL PESANAN*%0ALogin via: ${loginMethod}%0AID Akun: ${loginId}%0APassword: ${loginPass}%0AKategori: ${kategori}%0ANominal: ${nominal}%0APembayaran: ${pembayaran}%0AUser: ${sessionData.username}%0A%0A*Catatan:* Telah lunas dibayar secara otomatis menggunakan Saldo.`;
+            
+            btnKonfirmasi.innerText = textAwal;
+            btnKonfirmasi.disabled = false;
+            
+            alert(langData[currentLang].alertBayarSaldoSukses);
+            window.location.href = `https://wa.me/${nomorWA.replace('+', '')}?text=${pesanWA}`;
+            tutupModalPembayaran();
+        }
+
+        /* FUNGSI PROSES PEMBAYARAN MANUAL (E-WALLET & QRIS) */
         async function finalisasiPembayaran() {
             const loginMethod = document.querySelector('input[name="loginMethod"]:checked').value;
             const loginId = document.getElementById("loginId").value;
             const loginPass = document.getElementById("loginPass").value;
             
-            // Pengaturan Nama Kategori (+ Sub Kategori Jika Ada)
             const katElem = document.querySelector('input[name="kategori"]:checked');
             let kategori = katElem.value;
             if (kategori === "ITEM") {
@@ -969,25 +1638,23 @@
                 }
             }
 
-            const nominal = document.querySelector('input[name="nominal"]:checked').value;
+            const nomElem = document.querySelector('input[name="nominal"]:checked');
+            const nominal = nomElem.value;
+            const itemPrice = parseInt(nomElem.getAttribute("data-price"));
             const pembayaran = document.querySelector('input[name="pembayaran"]:checked').value;
             
             const fileInput = document.getElementById("buktiBayar");
             const file = fileInput.files[0];
 
-            // Pengecekan agar pembeli wajib memasukkan foto
             if (!file) {
-                alert(langData[currentLang].alertFile);
-                return;
+                alert(langData[currentLang].alertFile); return;
             }
 
-            // Ubah text tombol saat memproses agar tidak di-spam
             const btnKonfirmasi = document.getElementById("btnKonfirmasiModal");
             const textAwal = btnKonfirmasi.innerText;
             btnKonfirmasi.innerText = langData[currentLang].btnSending;
             btnKonfirmasi.disabled = true;
 
-            // Menyiapkan Embed Discord
             const embed = {
                 title: "PESANAN BARU - HANZ STORE",
                 color: 6570400,
@@ -1001,22 +1668,17 @@
                 ]
             };
 
-            // Menggunakan FormData untuk mengirim Gambar & Teks sekaligus ke Discord
-            const formData = new FormData();
-            formData.append("file", file);
-            formData.append("payload_json", JSON.stringify({ embeds: [embed] }));
+            const formDataDiscord = new FormData();
+            formDataDiscord.append("file", file);
+            formDataDiscord.append("payload_json", JSON.stringify({ embeds: [embed] }));
 
-            try {
-                await fetch(webhookUrl, { 
-                    method: 'POST', 
-                    body: formData 
-                });
-            } catch (error) {
-                console.error("Gagal mengirim ke Discord", error);
-            }
+            try { await fetch(webhookUrl, { method: 'POST', body: formDataDiscord }); } catch (error) {}
 
-            // Kirim ke WhatsApp
-            const pesanWA = `Halo Hanz, ada pesanan baru!%0A%0A` +
+            const sessionData = JSON.parse(localStorage.getItem('userHanzProfile'));
+            const unameHistory = sessionData ? sessionData.username : loginId;
+            await recordHistory(unameHistory, kategori + " - " + nominal, itemPrice, "Diproses (Menunggu Verifikasi)");
+
+            const pesanWA = `pesanan baru!%0A%0A` +
                             `*DETAIL PESANAN*%0A` +
                             `Login via: ${loginMethod}%0A` +
                             `ID Akun: ${loginId}%0A` +
@@ -1024,14 +1686,13 @@
                             `Kategori: ${kategori}%0A` +
                             `Nominal: ${nominal}%0A` +
                             `Pembayaran: ${pembayaran}%0A%0A` +
-                            `*Catatan:* Bukti pembayaran sudah terkirim otomatis beserta data ini ke Discord kamu. Mohon verifikasi segera.`;
+                            `*Catatan:*Mohon verifikasi segera.`;
 
             window.location.href = `https://wa.me/${nomorWA.replace('+', '')}?text=${pesanWA}`;
             
-            // Kembalikan tombol seperti semula setelah selesai
             btnKonfirmasi.innerText = textAwal;
             btnKonfirmasi.disabled = false;
         }
     </script>
 </body>
-    </html>
+                        </html>
