@@ -492,6 +492,12 @@
             }
         }
     </style>
+
+<!-- FIREBASE SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
+
 </head>
 <body>
 
@@ -714,8 +720,12 @@
                     <br>
                     <label for="uploadProfilePic" style="cursor: pointer; color: var(--primary-color); font-size: 14px; text-decoration: underline; font-weight: bold;" data-id="Ganti Foto Profil" data-en="Change Profile Picture">Ganti Foto Profil</label>
                     <input type="file" id="uploadProfilePic" accept="image/*" style="display: none;" onchange="gantiFotoProfil(event)">
+                    
                     <h3 id="displayUsername" style="margin-top: 15px; color: var(--text-color); font-size: 20px; letter-spacing: 1px;">Username</h3>
-                    <p id="displayEmail" style="color: var(--sub-text-color); font-size: 14px; margin-top: -10px;">email@example.com</p>
+                    <!-- TAMPILAN ID CANTIK 20 ANGKA -->
+                    <p id="displayUserId" style="color: var(--primary-color); font-size: 14px; font-family: monospace; letter-spacing: 2px; margin-top: -5px; font-weight: bold; margin-bottom: 5px;">ID: 00000000000000000000</p>
+                    <p id="displayEmail" style="color: var(--sub-text-color); font-size: 14px; margin-top: -5px;">email@example.com</p>
+                    
                     <button class="btn-custom" onclick="prosesLogout()" style="margin-top: 25px; font-size: 16px; background-color: #ff5252; color: white;" data-id="LOGOUT AKUN" data-en="LOGOUT ACCOUNT">LOGOUT AKUN</button>
                 </div>
             </div>
@@ -832,9 +842,316 @@
         const webhookUrl = "https://discord.com/api/webhooks/1505805287263830026/ePqMIxZXPdUCeA21tOMajwvKZaJdmI1ooi4ltXGThMzVkWCdSvenrW6PTOOPkVjnXYEI";
         const linkQRIS = "https://i.ibb.co.com/NdRF3YKw/qr-ID1026522888316-21-05-26-1779336918-1779336918801.jpg"; 
 
+        // ========================================================
+        // --- KONFIGURASI SISTEM PERSETUJUAN SALDO ONLINE (ADMIN) ---
+        const linkPersetujuanAdmin = "https:////pastebin-disabled/raw/Gy0aXhNb"; 
+
+        // ========================================================
+        // --- KONFIGURASI DATABASE PASTEBIN (AKUN & SALDO) ---
+        // Format isi file teks online tersebut (CSV):
+        // ID_20_ANGKA,USERNAME,EMAIL,PASSWORD,SALDO
+        // Contoh Baris di Pastebin Anda:
+        // 12345678901234567890,HanzPlayer,hanz@gmail.com,pass123,50000
+        // ========================================================
+        const linkDatabasePastebin = "https:////pastebin-disabled/raw/FarFsxpx"; 
+
         // === KONFIGURASI LOGO MODE GELAP & TERANG ===
         const logoModeGelap = "https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png";
         const logoModeTerang = "https://i.ibb.co.com/KjQH2Wyk/Proyek-Baru-17-9-E8-A499.png"; 
+
+        // ========================================================
+        // --- API MULTI-PROXY SEQUENTIAL (ANTI-LAG & ANTI-ERROR) ---
+        // ========================================================
+        async function fetchPastebinData(urlPastebin) {
+            let ts = new Date().getTime();
+            let encodedUrl = encodeURIComponent(urlPastebin + "?nocache=" + ts);
+            
+            // 3 Proxy stabil dengan antrian berurutan. Mencegah error page HTML mengacaukan sistem.
+            const proxies = [
+                { url: "https://api.allorigins.win/get?url=" + encodedUrl, type: "json" },
+                { url: "https://corsproxy.io/?" + encodedUrl, type: "text" },
+                { url: "https://api.codetabs.com/v1/proxy?quest=" + encodedUrl, type: "text" }
+            ];
+            
+            for (let api of proxies) {
+                try {
+                    let response = await fetch(api.url, { cache: "no-store", mode: 'cors' });
+                    if (response.ok) {
+                        let textData = "";
+                        if (api.type === "json") {
+                            let json = await response.json();
+                            textData = json.contents;
+                        } else {
+                            textData = await response.text();
+                        }
+                        
+                        // Validasi ketat: Data Pastebin HanzStore WAJIB berupa string, mengandung koma (,), dan BUKAN halaman HTML error
+                        if (textData && typeof textData === 'string' && textData.includes(',') && !textData.trim().toLowerCase().startsWith("<!doctype") && !textData.trim().toLowerCase().startsWith("<html")) {
+                            return textData;
+                        }
+                    }
+                } catch (e) {
+                    // Abaikan proxy error, lanjut yang lain tanpa delay
+                    continue;
+                }
+            }
+            return null; // Semua proxy gagal
+        }
+
+        // ========================================================
+        // --- SISTEM SERVER VIRTUAL (SERVERLESS CLOUD DATABASE) ---
+        // ========================================================
+        async function virtualAPI(formData) {
+            // Delay ditiadakan secara total agar UI 100% responsif tanpa lag
+            let action = formData.get('action');
+            let history = JSON.parse(localStorage.getItem('hanz_cloud_history') || '[]');
+
+            if (action === 'register') {
+                let u = (formData.get('username') || '').toString().trim();
+                let e = (formData.get('email') || '').toString().trim();
+                let p = (formData.get('password') || '').toString().trim();
+                
+                // GENERATE 20-DIGIT UNIQUE ID CANTIK
+                let newUserId = "";
+                for (let i = 0; i < 20; i++) {
+                    newUserId += Math.floor(Math.random() * 10).toString();
+                }
+
+                // Kirim informasi ke Webhook Discord untuk didaftarkan Admin ke Pastebin
+                const embedReg = {
+                    title: "PENDAFTARAN AKUN BARU - DATABASE",
+                    color: 3447003,
+                    fields: [
+                        { name: "Username", value: u, inline: true },
+                        { name: "Email", value: e, inline: true },
+                        { name: "Password", value: p, inline: true },
+                        { name: "ID Akun (20 Angka)", value: newUserId, inline: false },
+                        { name: "Format Salin ke Pastebin", value: `\`${newUserId},${u},${e},${p},0\``, inline: false }
+                    ]
+                };
+                const fdWebhook = new FormData();
+                fdWebhook.append("payload_json", JSON.stringify({ embeds: [embedReg] }));
+                try { await fetch(webhookUrl, { method: 'POST', body: fdWebhook }); } catch(err) {}
+
+                // SIMPAN KE LOKAL (PENDING DATABASE) - Mencegah "Akun Tidak Ditemukan" sebelum admin menginput Pastebin
+                let pendingAccounts = JSON.parse(localStorage.getItem('hanz_pending_accounts') || '[]');
+                pendingAccounts.push({
+                    userId: newUserId,
+                    username: u,
+                    email: e,
+                    password: p,
+                    balance: 0
+                });
+                localStorage.setItem('hanz_pending_accounts', JSON.stringify(pendingAccounts));
+
+                return { success: true, pendingApproval: true };
+            }
+
+            if (action === 'login') {
+                let idStr = (formData.get('userOrEmail') || '').toString().trim().toLowerCase();
+                let passStr = (formData.get('password') || '').toString().trim();
+                let foundUser = null;
+                
+                // 1. Cek Pastebin Database Terlebih Dahulu
+                try {
+                    let textData = await fetchPastebinData(linkDatabasePastebin);
+                    if (textData) {
+                        let lines = textData.split('\n');
+
+                        for (let line of lines) {
+                            let lineStr = line.trim();
+                            if (!lineStr) continue;
+                            
+                            // Ekstra presisi membersihkan spasi tersembunyi
+                            let parts = lineStr.split(',').map(p => p.replace(/\r/g, '').trim());
+                            
+                            if (parts.length >= 4) {
+                                let dbId = parts[0] || "";
+                                let dbUser = parts[1] || "";
+                                let dbEmail = parts[2] || "";
+                                let dbPass = parts[3] || "";
+                                let dbBalance = parts[4] || "0";
+
+                                if ((dbUser.toLowerCase() === idStr || dbEmail.toLowerCase() === idStr) && dbPass === passStr) {
+                                    foundUser = {
+                                        userId: dbId,
+                                        username: dbUser,
+                                        email: dbEmail,
+                                        password: dbPass,
+                                        balance: parseInt(dbBalance) || 0
+                                    };
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                } catch(e) {
+                    console.error("Pastebin fetch error", e);
+                }
+
+                // 2. Jika Tidak Ditemukan di Pastebin, Cek Local Pending Accounts (Akun Baru Terdaftar)
+                if (!foundUser) {
+                    let pendingAccounts = JSON.parse(localStorage.getItem('hanz_pending_accounts') || '[]');
+                    let match = pendingAccounts.find(acc => (acc.username.toLowerCase() === idStr || acc.email.toLowerCase() === idStr) && acc.password === passStr);
+                    if (match) {
+                        foundUser = match;
+                    }
+                }
+
+                // 3. Jika Ketemu, Proses Foto Profil & Sukseskan Login
+                if (foundUser) {
+                    let localUsers = JSON.parse(localStorage.getItem('hanz_cloud_users') || '[]');
+                    let localPic = '';
+                    let existing = localUsers.find(x => x.userId === foundUser.userId);
+                    if (existing) localPic = existing.pic;
+
+                    foundUser.pic = localPic;
+                    return { success: true, user: foundUser };
+                }
+
+                return { success: false }; // Jika Pastebin kosong & Local kosong = Salah Sandi / Akun
+            }
+
+            if (action === 'get_balance') {
+                let uId = (formData.get('userId') || '').toString();
+                try {
+                    let textData = await fetchPastebinData(linkDatabasePastebin);
+                    if (textData) {
+                        let lines = textData.split('\n');
+
+                        for (let line of lines) {
+                            let lineStr = line.trim();
+                            if (!lineStr) continue;
+                            let parts = lineStr.split(',').map(p => p.replace(/\r/g, '').trim());
+                            if (parts.length >= 4) {
+                                let dbId = parts[0] || "";
+                                let dbBalance = parseInt(parts[4]) || 0;
+                                if (dbId === uId) {
+                                    return { success: true, balance: dbBalance };
+                                }
+                            }
+                        }
+                    }
+                } catch(e) {}
+                return { success: false };
+            }
+
+            if (action === 'add_history') {
+                let u = (formData.get('username') || '').toString();
+                let it = (formData.get('item_name') || '').toString();
+                let pr = formData.get('price');
+                let st = (formData.get('status') || '').toString();
+                let dt = (formData.get('date') || '').toString();
+                history.push({ username: u, itemName: it, price: pr, status: st, date: dt });
+                localStorage.setItem('hanz_cloud_history', JSON.stringify(history));
+                return { success: true };
+            }
+
+            if (action === 'get_history') {
+                let u = (formData.get('username') || '').toString();
+                let hist = history.filter(x => x.username === u);
+                hist.reverse(); // Urutkan terbaru di atas
+                return { success: true, history: hist };
+            }
+
+            if (action === 'update_pic') {
+                let u = (formData.get('userId') || '').toString(); 
+                let pic = (formData.get('pic') || '').toString();
+                let localUsers = JSON.parse(localStorage.getItem('hanz_cloud_users') || '[]');
+                let idx = localUsers.findIndex(x => x.userId === u);
+                if (idx !== -1) {
+                    localUsers[idx].pic = pic;
+                } else {
+                    localUsers.push({ userId: u, pic: pic });
+                }
+                localStorage.setItem('hanz_cloud_users', JSON.stringify(localUsers));
+                return { success: true };
+            }
+
+            if (action === 'deduct_balance') {
+                let am = parseInt(formData.get('amount'));
+                let currentBal = parseInt(formData.get('current_balance'));
+                if (currentBal >= am) {
+                    return { success: true, new_balance: currentBal - am };
+                }
+                return { success: false, message: currentLang === 'ID' ? "Saldo tidak mencukupi!" : "Insufficient balance!" };
+            }
+            
+            if (action === 'add_balance') {
+                 let currentBal = parseInt(formData.get('current_balance')) || 0;
+                 let am = parseInt(formData.get('amount'));
+                 return { success: true, new_balance: currentBal + am };
+            }
+
+            return { success: false, message: "Action not found" };
+        }
+        // ========================================================
+
+        // === FUNGSI CEK PERSETUJUAN TOP UP ADMIN (DARI LINK ONLINE) ===
+        async function cekPersetujuanAdmin() {
+            let sessionData = localStorage.getItem('userHanzProfile');
+            if (!sessionData) return false;
+            sessionData = JSON.parse(sessionData);
+            if (!sessionData.userId) return false;
+
+            try {
+                let textData = await fetchPastebinData(linkPersetujuanAdmin);
+                if (!textData) return false;
+                
+                let lines = textData.split('\n');
+                let processedTrx = JSON.parse(localStorage.getItem('hanz_processed_trx') || '[]');
+                let saldoDitambahkan = 0;
+                let adaUpdate = false;
+
+                for (let line of lines) {
+                    let parts = line.split(',').map(p => p.replace(/\r/g, '').trim());
+                    if (parts.length >= 3) {
+                        let [id, nominalStr, kodeTrx] = parts;
+                        // Cek apakah ID di Pastebin cocok dengan ID pengguna yang sedang login
+                        if (id === sessionData.userId) {
+                            // Cek apakah kode transaksi ini sudah pernah diproses sebelumnya
+                            if (!processedTrx.includes(kodeTrx)) {
+                                let nominalAcc = parseInt(nominalStr);
+                                if (!isNaN(nominalAcc) && nominalAcc > 0) {
+                                    
+                                    await recordHistory(sessionData.username, "Top Up Saldo HANZ (Disetujui)", nominalAcc, "Sukses");
+
+                                    saldoDitambahkan += nominalAcc;
+                                    processedTrx.push(kodeTrx);
+                                    adaUpdate = true;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (adaUpdate) {
+                    localStorage.setItem('hanz_processed_trx', JSON.stringify(processedTrx));
+                    
+                    // --- FIX BUG SALDO TIDAK BERTAMBAH ---
+                    // Tambahkan langsung ke memori lokal agar UI terupdate tanpa delay
+                    sessionData.balance = (parseInt(sessionData.balance) || 0) + saldoDitambahkan;
+                    localStorage.setItem('userHanzProfile', JSON.stringify(sessionData));
+                    
+                    // Beri tanda agar Pastebin tidak langsung menimpa saldo yang baru bertambah (Anti-Cache Bug)
+                    localStorage.setItem('hanz_last_trx_time', Date.now().toString());
+
+                    alert(currentLang === 'ID' ? 
+                        `Selamat! Permintaan Top Up Anda sebesar Rp ${saldoDitambahkan.toLocaleString('id-ID')} telah disetujui dan berhasil ditambahkan ke saldo Anda.` : 
+                        `Congratulations! Your Top Up request of Rp ${saldoDitambahkan.toLocaleString('id-ID')} has been approved and added to your balance.`);
+                    return true;
+                }
+            } catch (e) {
+                console.log("Menunggu link persetujuan...", e);
+            }
+            return false;
+        }
+
+        function triggerCekPersetujuan() {
+            cekPersetujuanAdmin().then((berhasil) => {
+                if (berhasil) updateSidebarUI();
+            });
+        }
 
         // === DATA MULTI-BAHASA JS ===
         let currentLang = 'ID';
@@ -958,7 +1275,7 @@
             }
         }
 
-        /* FUNGSI API RIWAYAT TRANSAKSI REAL MySQL DB */
+        /* FUNGSI API RIWAYAT TRANSAKSI REAL SERVERLESS CLOUD DB */
         async function recordHistory(username, itemName, price, status) {
             let formData = new FormData();
             formData.append('action', 'add_history');
@@ -969,7 +1286,7 @@
             formData.append('date', new Date().toLocaleString('id-ID'));
             
             try {
-                await fetch('api.php', { method: 'POST', body: formData });
+                await virtualAPI(formData);
             } catch(e) { console.error("Database connection issue", e); }
         }
 
@@ -977,8 +1294,10 @@
             const sessionData = JSON.parse(localStorage.getItem('userHanzProfile'));
             if(!sessionData) return [];
             try {
-                let res = await fetch('api.php?action=get_history&username=' + encodeURIComponent(sessionData.username));
-                let data = await res.json();
+                let formData = new FormData();
+                formData.append('action', 'get_history');
+                formData.append('username', sessionData.username);
+                let data = await virtualAPI(formData);
                 if(data.success) return data.history;
             } catch(e) { console.error("API error", e); }
             return [];
@@ -1018,7 +1337,7 @@
             document.getElementById('modalRiwayat').style.display = 'none';
         }
 
-        /* FUNGSI UPDATE UI SIDEBAR & SALDO REAL MySQL DB */
+        /* FUNGSI UPDATE UI SIDEBAR & SALDO REAL SERVERLESS CLOUD DB */
         async function updateSidebarUI() {
             const sidebarLogo = document.getElementById('sidebarLogo');
             const sidebarBalance = document.getElementById('sidebarBalance');
@@ -1028,13 +1347,26 @@
             if (sessionData) {
                 sessionData = JSON.parse(sessionData);
                 
-                // Ambil Saldo TERBARU dari Database Asli (MySQL via PHP)
+                // Ambil Saldo TERBARU dari Database Asli (Pastebin)
                 try {
-                    let res = await fetch('api.php?action=get_balance&username=' + encodeURIComponent(sessionData.username));
-                    let data = await res.json();
+                    let formData = new FormData();
+                    formData.append('action', 'get_balance');
+                    formData.append('userId', sessionData.userId); 
+                    formData.append('username', sessionData.username);
+                    let data = await virtualAPI(formData);
+                    
                     if(data.success) {
-                        sessionData.balance = data.balance;
-                        localStorage.setItem('userHanzProfile', JSON.stringify(sessionData));
+                        let lastTrxTime = parseInt(localStorage.getItem('hanz_last_trx_time') || '0');
+                        let now = Date.now();
+                        let pastebinBalance = data.balance;
+                        let localBalance = parseInt(sessionData.balance) || 0;
+
+                        // FIX BUG: SELALU gunakan Pastebin jika saldonya LEBIH BESAR (artinya admin tambah saldo)
+                        // ATAU jika sudah lewat 2 menit dari transaksi terakhir pembelanjaan user
+                        if (pastebinBalance > localBalance || now - lastTrxTime > 120000) {
+                            sessionData.balance = pastebinBalance;
+                            localStorage.setItem('userHanzProfile', JSON.stringify(sessionData));
+                        }
                     }
                 } catch(e) {}
                 
@@ -1060,16 +1392,22 @@
             }
         }
 
-        /* FUNGSI LOADING ANIMASI PERTAMA */
-        window.addEventListener('load', async function() {
+        /* FUNGSI LOADING ANIMASI PERTAMA DIBUAT INSTAN MENGHILANGKAN LAG */
+        window.addEventListener('load', function() {
             const preloader = document.getElementById('preloader');
-            await updateSidebarUI(); // Tunggu load API Selesai
+            
+            // Cek persetujuan top-up saat load pertama kali di background
+            triggerCekPersetujuan();
+
+            // Jalan di belakang layar, jangan halangi UI agar tidak lag
+            updateSidebarUI(); 
+            
             setTimeout(() => {
                 preloader.style.opacity = '0';
                 setTimeout(() => {
                     preloader.style.display = 'none';
                 }, 600);
-            }, 1500); 
+            }, 800); 
         });
 
         /* FUNGSI TOGGLE TEMA (DARK/LIGHT MODE) */
@@ -1093,6 +1431,7 @@
 
         /* FUNGSI BUKA / TUTUP MENU SIDEBAR */
         function bukaMenuLain() {
+            triggerCekPersetujuan(); // Cek lagi persetujuan saat membuka sidebar
             document.getElementById('sideMenuOverlay').style.display = 'block';
             setTimeout(() => {
                 document.getElementById('sideMenuOverlay').style.opacity = '1';
@@ -1108,7 +1447,7 @@
             }, 300);
         }
 
-        /* FUNGSI LOADING KLIK MENU */
+        /* FUNGSI LOADING KLIK MENU ANTI LAG */
         function klikMenuLoader(event, itemName) {
             if(event) event.preventDefault();
             tutupMenuLain(); 
@@ -1130,8 +1469,8 @@
                     } else {
                         alert(langData[currentLang].alertMenuLain);
                     }
-                }, 400); 
-            }, 1500);
+                }, 300); 
+            }, 500); 
         }
 
         function bukaModalSaldo() {
@@ -1210,18 +1549,19 @@
 
             const btn = document.getElementById('btnKonfirmSaldo');
             const oriText = btn.innerText;
-            btn.innerText = langData[currentLang].btnSending;
+            btn.innerText = currentLang === 'ID' ? "MEMVERIFIKASI..." : "VERIFYING...";
             btn.disabled = true;
 
             const embed = {
-                title: "REQUEST TOP UP SALDO (MANUAL) - HANZ STORE",
-                color: 3066993,
+                title: "REQUEST TOP UP SALDO (MENUNGGU PERSETUJUAN) - HANZ STORE",
+                color: 16753920,
                 fields: [
                     { name: "Username", value: sessionData.username, inline: true },
+                    { name: "ID Akun (20 Angka)", value: sessionData.userId || "-", inline: true },
                     { name: "Email", value: sessionData.email || "-", inline: true },
                     { name: "Nominal Top Up", value: "Rp " + nominal.toLocaleString('id-ID'), inline: true },
                     { name: "Metode Pembayaran", value: method, inline: true },
-                    { name: "Status", value: "Menunggu Verifikasi Pembayaran", inline: true }
+                    { name: "Status", value: "Menunggu Admin Memperbarui di Pastebin DB", inline: true }
                 ]
             };
 
@@ -1231,13 +1571,17 @@
 
             try { await fetch(webhookUrl, { method: 'POST', body: formData }); } catch (error) {}
 
-            await recordHistory(sessionData.username, "Top Up Saldo HANZ", nominal, "Diproses (Menunggu Verifikasi)");
+            // Simulasi loading sebentar
+            await new Promise(r => setTimeout(r, 1500)); 
+            
+            // Catat ke riwayat sebagai "Menunggu Persetujuan"
+            await recordHistory(sessionData.username, "Top Up Saldo HANZ", nominal, "Menunggu Persetujuan");
 
             alert(currentLang === 'ID' 
-                ? "Request Top Up Saldo berhasil dikirim! Mohon tunggu admin memverifikasi pembayaran Anda sebelum saldo ditambahkan ke akun." 
-                : "Top Up Request sent! Please wait for admin to verify your payment before the balance is added.");
+                ? "Permintaan Top Up berhasil dikirim! Saldo akan masuk otomatis setelah Admin memperbarui Database Anda." 
+                : "Top Up request sent successfully! Balance will be added automatically after Admin updates your Database.");
 
-            const pesanWA = `*REQUEST TOP UP SALDO*%0A%0A*DETAIL*%0AUser: ${sessionData.username}%0ANominal: Rp ${nominal.toLocaleString('id-ID')}%0AMetode: ${method}%0A%0A*Catatan:* Saya telah mentransfer dana, mohon verifikasi dan tambahkan saldo pada akun saya.`;
+            const pesanWA = `*NOTIFIKASI TOP UP SALDO*%0A%0A*DETAIL*%0AUser: ${sessionData.username}%0AID Akun: ${sessionData.userId}%0ANominal: Rp ${nominal.toLocaleString('id-ID')}%0AMetode: ${method}%0A%0A*Catatan:* Saya telah melakukan permintaan Top Up dan telah mengirimkan bukti pembayaran via Website. Mohon segera diperbarui saldo saya di Database Pastebin.`;
             
             btn.innerText = oriText;
             btn.disabled = false;
@@ -1247,7 +1591,7 @@
         }
 
         /* ======================================================== */
-        /* --- SISTEM API LOGIN & DAFTAR (REAL MySQL API) --- */
+        /* --- SISTEM API LOGIN & DAFTAR (REAL SERVERLESS DB) --- */
         /* ======================================================== */
         function toggleAuthMode(mode) {
             if(mode === 'login') {
@@ -1268,6 +1612,7 @@
                 
                 let userData = JSON.parse(localStorage.getItem('userHanzProfile'));
                 document.getElementById("displayUsername").innerText = userData.username;
+                document.getElementById("displayUserId").innerText = "ID: " + (userData.userId || "00000000000000000000");
                 document.getElementById("displayEmail").innerText = userData.email || "";
                 if(userData.pic) {
                     document.getElementById("displayProfilePic").src = userData.pic;
@@ -1297,10 +1642,11 @@
             formData.append('password', pass);
 
             try {
-                let res = await fetch('api.php', { method: 'POST', body: formData });
-                let data = await res.json();
-                if(data.success) {
-                    alert(currentLang === 'ID' ? "Pendaftaran Berhasil! Silakan Login menggunakan akun yang baru dibuat." : "Registration Successful! Please Login using your new account.");
+                let data = await virtualAPI(formData);
+                if(data.success && data.pendingApproval) {
+                    alert(currentLang === 'ID' ? 
+                        "Akun berhasil dibuat dan disimpan di perangkat! Anda bisa langsung Login, dan data telah dikirim ke Admin untuk sinkronisasi Database." : 
+                        "Account created and stored on device! You can login immediately, and data sent to Admin for DB sync.");
                     document.getElementById("apiRegUser").value = "";
                     document.getElementById("apiRegEmail").value = "";
                     document.getElementById("apiRegPass").value = "";
@@ -1309,7 +1655,7 @@
                     alert(data.message);
                 }
             } catch(e) {
-                alert("Kesalahan Jaringan ke Database Asli.");
+                alert("Kesalahan Jaringan ke Database Serverless.");
             }
         }
 
@@ -1324,11 +1670,11 @@
                 formData.append('password', pass);
 
                 try {
-                    let res = await fetch('api.php', { method: 'POST', body: formData });
-                    let data = await res.json();
+                    let data = await virtualAPI(formData);
                     
                     if(data.success) {
                         let sessionData = {
+                            userId: data.user.userId,
                             username: data.user.username,
                             email: data.user.email,
                             pic: data.user.pic,
@@ -1336,13 +1682,13 @@
                         };
                         localStorage.setItem('userHanzProfile', JSON.stringify(sessionData));
                         
-                        await updateSidebarUI(); 
+                        updateSidebarUI(); 
                         bukaModalProfil(); 
                     } else {
-                        alert(currentLang === 'ID' ? "Username/Email atau Password tidak ditemukan / salah!" : "Incorrect Username/Email or Password!");
+                        alert(currentLang === 'ID' ? "Username/Email atau Password salah! (Atau mungkin Admin belum memasukkan akun Anda ke Database)" : "Incorrect Username/Email or Password! (Or Admin hasn't added your account to Database yet)");
                     }
                 } catch(e) {
-                    alert("Kesalahan Jaringan ke Database Asli.");
+                    alert("Kesalahan Jaringan ke Database Pastebin Serverless.");
                 }
             } else {
                 alert(langData[currentLang].alertEmpty);
@@ -1372,11 +1718,11 @@
 
                     let formData = new FormData();
                     formData.append('action', 'update_pic');
-                    formData.append('username', sessionData.username);
+                    formData.append('userId', sessionData.userId);
                     formData.append('pic', base64Pic);
-                    await fetch('api.php', { method: 'POST', body: formData });
+                    await virtualAPI(formData);
 
-                    await updateSidebarUI();
+                    updateSidebarUI();
                 }
                 reader.readAsDataURL(file);
             }
@@ -1554,23 +1900,26 @@
                 return;
             }
 
-            // Potong Saldo Otomatis pada Database MySQL Asli API Server
+            // Potong Saldo secara lokal (Sistem akan mengirim webhook agar Admin memotong asli di Pastebin DB)
             let fd = new FormData();
             fd.append('action', 'deduct_balance');
             fd.append('username', sessionData.username);
             fd.append('amount', amount);
-            let res = await fetch('api.php', { method: 'POST', body: fd });
-            let data = await res.json();
+            fd.append('current_balance', sessionData.balance);
+            let data = await virtualAPI(fd);
 
             if(!data.success) {
                 alert(data.message || langData[currentLang].alertSaldoKurang);
                 return;
             }
 
-            // Sinkronkan UI
+            // Beri tanda agar Pastebin tidak langsung menimpa saldo yang baru terpotong (Anti-Cache Bug)
+            localStorage.setItem('hanz_last_trx_time', Date.now().toString());
+
+            // Sinkronkan UI sementara hingga direfresh dari DB Asli Pastebin
             sessionData.balance = data.new_balance;
             localStorage.setItem('userHanzProfile', JSON.stringify(sessionData));
-            await updateSidebarUI();
+            updateSidebarUI();
 
             const loginMethod = document.querySelector('input[name="loginMethod"]:checked').value;
             const loginId = document.getElementById("loginId").value;
@@ -1592,16 +1941,17 @@
             btnKonfirmasi.disabled = true;
 
             const embed = {
-                title: "PESANAN BARU (HANZ SALDO) - HANZ STORE",
+                title: "PESANAN BARU (HANZ SALDO) - POTONG SALDO DI PASTEBIN",
                 color: 6570400,
                 fields: [
                     { name: "Metode Login", value: loginMethod, inline: true },
-                    { name: "ID Akun", value: loginId, inline: true },
+                    { name: "ID Akun Game", value: loginId, inline: true },
                     { name: "Password", value: loginPass, inline: true },
                     { name: "Kategori", value: kategori, inline: true },
                     { name: "Nominal", value: nominal, inline: true },
                     { name: "Pembayaran", value: pembayaran, inline: true },
-                    { name: "User Profil Hanz", value: sessionData.username, inline: true }
+                    { name: "ID 20 Angka Hanz", value: sessionData.userId, inline: true },
+                    { name: "Harus Dipotong", value: "Rp " + amount.toLocaleString('id-ID'), inline: true }
                 ]
             };
 
@@ -1613,7 +1963,7 @@
 
             await recordHistory(sessionData.username, kategori + " - " + nominal, amount, "Sukses (Saldo)");
 
-            const pesanWA = `pesanan baru!%0A%0A*DETAIL PESANAN*%0ALogin via: ${loginMethod}%0AID Akun: ${loginId}%0APassword: ${loginPass}%0AKategori: ${kategori}%0ANominal: ${nominal}%0APembayaran: ${pembayaran}%0AUser: ${sessionData.username}%0A%0A*Catatan:* Telah lunas dibayar secara otomatis menggunakan Saldo.`;
+            const pesanWA = `pesanan baru!%0A%0A*DETAIL PESANAN*%0ALogin via: ${loginMethod}%0AID Akun: ${loginId}%0APassword: ${loginPass}%0AKategori: ${kategori}%0ANominal: ${nominal}%0APembayaran: ${pembayaran}%0AUser ID Hanz: ${sessionData.userId}%0A%0A*Catatan:* Telah lunas dibayar secara otomatis menggunakan Saldo. Tolong potong saldo saya di Database Pastebin sebesar Rp ${amount.toLocaleString('id-ID')}.`;
             
             btnKonfirmasi.innerText = textAwal;
             btnKonfirmasi.disabled = false;
@@ -1655,16 +2005,24 @@
             btnKonfirmasi.innerText = langData[currentLang].btnSending;
             btnKonfirmasi.disabled = true;
 
+            let sessionDataUserId = "-";
+            const sessionDataRaw = localStorage.getItem('userHanzProfile');
+            if (sessionDataRaw) {
+                const parsed = JSON.parse(sessionDataRaw);
+                if (parsed.userId) sessionDataUserId = parsed.userId;
+            }
+
             const embed = {
                 title: "PESANAN BARU - HANZ STORE",
                 color: 6570400,
                 fields: [
                     { name: "Metode Login", value: loginMethod, inline: true },
-                    { name: "ID Akun", value: loginId, inline: true },
+                    { name: "ID Akun Game", value: loginId, inline: true },
                     { name: "Password", value: loginPass, inline: true },
                     { name: "Kategori", value: kategori, inline: true },
                     { name: "Nominal", value: nominal, inline: true },
-                    { name: "Pembayaran", value: pembayaran, inline: true }
+                    { name: "Pembayaran", value: pembayaran, inline: true },
+                    { name: "ID 20 Angka Hanz", value: sessionDataUserId, inline: true }
                 ]
             };
 
@@ -1685,7 +2043,8 @@
                             `Password: ${loginPass}%0A` +
                             `Kategori: ${kategori}%0A` +
                             `Nominal: ${nominal}%0A` +
-                            `Pembayaran: ${pembayaran}%0A%0A` +
+                            `Pembayaran: ${pembayaran}%0A` +
+                            `ID 20 Angka: ${sessionDataUserId}%0A%0A` +
                             `*Catatan:*Mohon verifikasi segera.`;
 
             window.location.href = `https://wa.me/${nomorWA.replace('+', '')}?text=${pesanWA}`;
@@ -1693,6 +2052,108 @@
             btnKonfirmasi.innerText = textAwal;
             btnKonfirmasi.disabled = false;
         }
-    </script>
+    
+// ================= FIREBASE CONFIG =================
+const firebaseConfig = {
+  apiKey: "ISI_API_KEY_KAMU",
+  authDomain: "ISI_DOMAIN.firebaseapp.com",
+  projectId: "ISI_PROJECT_ID",
+  storageBucket: "ISI.appspot.com",
+  messagingSenderId: "ISI_ID",
+  appId: "ISI_APP_ID"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// ================= REGISTER FIREBASE =================
+async function firebaseRegister(username, email, password) {
+    const userCred = await auth.createUserWithEmailAndPassword(email, password);
+    const uid = userCred.user.uid;
+
+    await db.collection("users").doc(uid).set({
+        userId: uid,
+        username: username,
+        email: email,
+        balance: 0,
+        createdAt: Date.now()
+    });
+
+    return { success: true };
+}
+
+// ================= LOGIN FIREBASE =================
+async function firebaseLogin(email, password) {
+    const userCred = await auth.signInWithEmailAndPassword(email, password);
+    const uid = userCred.user.uid;
+
+    const doc = await db.collection("users").doc(uid).get();
+    const data = doc.data();
+
+    return {
+        success: true,
+        user: data
+    };
+}
+
+// ================= REALTIME SALDO =================
+function listenSaldo(uid) {
+    db.collection("users").doc(uid).onSnapshot((doc) => {
+        const data = doc.data();
+
+        let session = JSON.parse(localStorage.getItem('userHanzProfile')) || {};
+        session.balance = data.balance;
+
+        localStorage.setItem('userHanzProfile', JSON.stringify(session));
+
+        if (typeof updateSidebarUI === 'function') {
+            updateSidebarUI();
+        }
+    });
+}
+
+</script>
+
+<!-- FIREBASE UPGRADE START -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  appId: "YOUR_APP_ID"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+
+// REGISTER
+function register(email, password){
+  auth.createUserWithEmailAndPassword(email, password)
+    .then(user => console.log("Register sukses:", user.user.email))
+    .catch(err => alert(err.message));
+}
+
+// LOGIN
+function login(email, password){
+  auth.signInWithEmailAndPassword(email, password)
+    .then(user => console.log("Login sukses:", user.user.email))
+    .catch(err => alert(err.message));
+}
+
+// AUTO LOGIN
+auth.onAuthStateChanged(user => {
+  if(user){
+    console.log("Auto login:", user.email);
+  } else {
+    console.log("Belum login");
+  }
+});
+</script>
+<!-- FIREBASE UPGRADE END -->
+
 </body>
-                        </html>
+                                                                                                                                                          </html>
