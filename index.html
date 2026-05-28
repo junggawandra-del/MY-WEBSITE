@@ -10,9 +10,9 @@
 <!-- ========================================== -->
 <meta content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" name="robots"/>
 <meta content="hanzstoretwn" name="author"/>
-<title id="pageTitle">HANZ STORE (hanzstoretwn) | Layanan Top Up Township &amp; Script Terpercaya</title>
-<meta content="Selamat datang di HANZ STORE (hanzstoretwn). Pusat layanan top up game Township, item, skin hewan, skin bangunan, dan layanan digital aman terpercaya. Cepat, Presisi, dan Aman!" name="description"/>
-<meta content="hanzstoretwn, HANZ STORE, hanz store, top up township, township indonesia, script hanz, hanzstore.twn, TOP UP TOWNSHIP TERLENGKAP, skin, township, hanz township, HANZ TOWNSHIP, SCRIPT, TOWNSHIP, TERLENGKAP, TERPERCAYA" name="keywords"/>
+<title id="pageTitle">HANZ STORE | Trusted Township Top Up</title>
+<meta content="HANZ STORE adalah pusat top up Township dan layanan digital terpercaya yang cepat, rapi, dan aman." name="description"/>
+<meta content="HANZ STORE, top up township, township indonesia, hanz store, top up aman, layanan digital" name="keywords"/>
 <!-- Open Graph untuk optimalisasi pencarian & share Sosial Media -->
 <meta content="HANZ STORE (hanzstoretwn) | Layanan Top Up Township" property="og:title"/>
 <meta content="Pusat layanan top up game Township, item, skin, dan layanan digital aman terpercaya oleh hanzstoretwn." property="og:description"/>
@@ -488,11 +488,132 @@
                 margin-bottom: 40px;
             }
         }
+    
+        /* ==============================
+           POLISH / PROFESSIONAL UPGRADE
+           ============================== */
+        html {
+            scroll-behavior: smooth;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            line-height: 1.5;
+            -webkit-tap-highlight-color: transparent;
+            background-image:
+                radial-gradient(circle at top left, rgba(100, 221, 23, 0.14), transparent 30%),
+                radial-gradient(circle at bottom right, rgba(82, 178, 2, 0.08), transparent 34%);
+            background-attachment: fixed;
+        }
+
+        .top-nav,
+        .container,
+        .side-menu,
+        .modal-content,
+        .form-group {
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+
+        .top-nav {
+            background-image: linear-gradient(180deg, rgba(30,30,30,0.92), rgba(30,30,30,0.82));
+        }
+
+        body.light-mode .top-nav {
+            background-image: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.86));
+        }
+
+        .container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            pointer-events: none;
+            background: linear-gradient(135deg, rgba(100,221,23,0.08), transparent 35%, rgba(100,221,23,0.04));
+        }
+
+        .btn-custom {
+            background-image: linear-gradient(135deg, var(--primary-color), #8fff4f);
+            box-shadow: 0 12px 24px rgba(100, 221, 23, 0.18);
+            letter-spacing: 0.4px;
+        }
+
+        .btn-custom:hover {
+            background-image: linear-gradient(135deg, #52b202, #7ef43c);
+            transform: translateY(-1px);
+        }
+
+        .btn-custom:active {
+            transform: translateY(0);
+        }
+
+        input::placeholder,
+        select::placeholder {
+            color: rgba(255, 255, 255, 0.45);
+        }
+
+        body.light-mode input::placeholder,
+        body.light-mode select::placeholder {
+            color: rgba(26, 26, 26, 0.45);
+        }
+
+        input:focus,
+        select:focus,
+        button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(100, 221, 23, 0.18);
+        }
+
+        .radio-box {
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset;
+        }
+
+        .radio-box:hover {
+            transform: translateY(-2px);
+        }
+
+        .modal-content {
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+        }
+
+        .lang-select {
+            min-width: 145px;
+        }
+
+        .side-menu-content a {
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+        }
+
+        .floating-cs {
+            box-shadow: 0 12px 28px rgba(100, 221, 23, 0.28);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
     </style>
 <!-- FIREBASE SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
 </head>
 <body>
 <!-- SCREEN LOADING ANIMASI PERTAMA -->
@@ -2028,17 +2149,26 @@
     
 // ================= FIREBASE CONFIG =================
 const firebaseConfig = {
-  apiKey: "AIzaSyBw77n2x99MiAYfVdXVrxZBWLiB454kZRo",
-  authDomain: "hanz-store-twn.firebaseapp.com",
-  projectId: "hanz-store-twn",
-  storageBucket: "hanz-store-twn.firebasestorage.app",
-  messagingSenderId: "760497752028",
-  appId: "1:760497752028:web:20bdb65fec19b3526ef119"
+  apiKey: "AIzaSyC-vcbveJQWxPehFHEI8tW1hsWm2bKv_rE",
+  authDomain: "hanz-web-store.firebaseapp.com",
+  projectId: "hanz-web-store",
+  storageBucket: "hanz-web-store.firebasestorage.app",
+  messagingSenderId: "519104445333",
+  appId: "1:519104445333:web:abdb33ac078ec69606d49c",
+  measurementId: "G-Q0NYLPFW7H"
 };
 
-firebase.initializeApp(firebaseConfig);
+const firebaseApp = firebase.apps.length ? firebase.app() : firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
+
+let analytics = null;
+try {
+    analytics = firebase.analytics();
+} catch (e) {
+    console.warn("Firebase Analytics tidak aktif:", e);
+}
+
 let saldoUnsubscribe = null;
 
 // ================= FIREBASE UTILITIES =================
