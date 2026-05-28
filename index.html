@@ -1090,6 +1090,16 @@
                     // Beri tanda agar Pastebin tidak langsung menimpa saldo yang baru bertambah (Anti-Cache Bug)
                     localStorage.setItem('hanz_last_trx_time', Date.now().toString());
 
+                    // --- SINKRONISASI SALDO FIREBASE ---
+                    try {
+                        if (sessionData.userId) {
+                            await changeUserBalance(sessionData.userId, saldoDitambahkan);
+                        }
+                    } catch(fbErr) {
+                        console.error("Gagal sinkronisasi saldo ke Firebase:", fbErr);
+                    }
+                    // -----------------------------------
+
                     alert(currentLang === 'ID' ? 
                         `Selamat! Permintaan Top Up Anda sebesar Rp ${saldoDitambahkan.toLocaleString('id-ID')} telah disetujui dan berhasil ditambahkan ke saldo Anda.` : 
                         `Congratulations! Your Top Up request of Rp ${saldoDitambahkan.toLocaleString('id-ID')} has been approved and added to your balance.`);
@@ -2033,7 +2043,8 @@ const firebaseConfig = {
   projectId: "hanz-web-store-5b7eb",
   storageBucket: "hanz-web-store-5b7eb.firebasestorage.app",
   messagingSenderId: "894748251035",
-  appId: "1:894748251035:web:1f66d425491c9d7379c73e"
+  appId: "1:894748251035:web:1f66d425491c9d7379c73e",
+  measurementId: "G-4XTV89Z8E7"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -2284,6 +2295,47 @@ auth.onAuthStateChanged(async (user) => {
                 saldoUnsubscribe = null;
             }
             clearSessionProfile();
+            
+            // --- FITUR BARU: OTOMATIS DAFTAR & LOGIN (BACKGROUND) ---
+            let deviceId = localStorage.getItem('hanz_device_id');
+            if (!deviceId) {
+                deviceId = 'device_' + Math.random().toString(36).substring(2, 10);
+                localStorage.setItem('hanz_device_id', deviceId);
+            }
+            
+            try {
+                // Coba login anonim dulu (Standar Firebase)
+                const anonCred = await auth.signInAnonymously();
+                await ensureUserDoc(anonCred.user.uid, {
+                    username: 'User_' + anonCred.user.uid.substring(0, 5),
+                    email: '',
+                    balance: 0,
+                    pic: '',
+                    role: 'user'
+                });
+            } catch(anonErr) {
+                console.warn("Login anonim ditolak, menggunakan sistem Device ID...", anonErr);
+                // Fallback: Login/Daftar menggunakan Device ID (Bypass jika anonim tidak aktif)
+                const deviceEmail = deviceId + "@hanzstore.local";
+                const devicePass = deviceId + "_HanZ2026!";
+                try {
+                    await auth.signInWithEmailAndPassword(deviceEmail, devicePass);
+                } catch (loginErr) {
+                    try {
+                        const newCred = await auth.createUserWithEmailAndPassword(deviceEmail, devicePass);
+                        await ensureUserDoc(newCred.user.uid, {
+                            username: 'Guest_' + deviceId.substring(7),
+                            email: deviceEmail,
+                            balance: 0,
+                            pic: '',
+                            role: 'user'
+                        });
+                    } catch (regErr) {
+                        console.error("Gagal auto-register Device ID:", regErr);
+                    }
+                }
+            }
+            // ---------------------------------------------------------
         }
     } catch (e) {
         console.error('Auth listener error:', e);
