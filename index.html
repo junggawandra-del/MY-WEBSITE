@@ -1677,18 +1677,87 @@
 
             try {
                 isManualAuthSwap = true; // FLAG - Mencegah bentrok dengan onAuthStateChanged Guest
-                const data = await firebaseRegister(user, email, pass);
-                if(data.success) {
-                    alert(currentLang === 'ID'
-                        ? "Akun berhasil disimpan ke Firebase. Silakan login menggunakan email atau username Anda."
-                        : "Account saved to Firebase. Please login using your email or username.");
-                    document.getElementById("apiRegUser").value = "";
-                    document.getElementById("apiRegEmail").value = "";
-                    document.getElementById("apiRegPass").value = "";
-                    toggleAuthMode('login');
+
+                // --- PERBAIKAN: Fungsi Helper Timeout dengan Pembersihan Memori ---
+                // Mencegah timer menggantung di latar belakang yang memblokir eksekusi
+                const withTimeout = (promise, ms, errorMsg) => {
+                    let timer;
+                    const timeoutPromise = new Promise((_, reject) => {
+                        timer = setTimeout(() => reject(new Error(errorMsg)), ms);
+                    });
+                    return Promise.race([promise, timeoutPromise]).finally(() => clearTimeout(timer));
+                };
+
+                // 1. Validasi Username di Firestore
+                // Menggunakan { source: 'server' } agar gagal cepat (fail-fast) jika offline, daripada macet (stuck).
+                const usernameSnap = await withTimeout(
+                    db.collection('users').where('usernameLower', '==', user.toLowerCase()).limit(1).get({ source: 'server' }),
+                    7000,
+                    "Timeout: Gagal mengecek ketersediaan Username. Periksa koneksi Anda."
+                );
+                if (!usernameSnap.empty) {
+                    throw new Error(currentLang === 'ID' ? "Username sudah digunakan." : "Username already taken.");
                 }
+
+                // 2. Buat Akun Firebase Auth (Otomatis mengecek apakah email sudah terdaftar via Server Firebase)
+                const userCred = await withTimeout(
+                    auth.createUserWithEmailAndPassword(email, pass),
+                    10000,
+                    "Timeout: Gagal membuat akun. Periksa koneksi internet Anda."
+                );
+                const uid = userCred.user.uid;
+
+                // DELAY KRUSIAL: Memberikan jeda singkat agar Firebase SDK dapat mensinkronkan 
+                // pergantian token Auth internal dengan instance Firestore.
+                await new Promise(resolve => setTimeout(resolve, 800));
+
+                // 3. Simpan Profil ke Firestore
+                await withTimeout(
+                    db.collection('users').doc(uid).set({
+                        userId: uid,
+                        username: user,
+                        usernameLower: user.toLowerCase(),
+                        email: email,
+                        emailLower: email.toLowerCase(),
+                        balance: 0,
+                        pic: '',
+                        role: 'user',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }),
+                    8000,
+                    "Timeout: Gagal menyimpan data profil ke server."
+                );
+
+                isExplicitLogout = false; // Reset status manual logout
+                
+                alert(currentLang === 'ID'
+                    ? "Pendaftaran berhasil! Akun Anda telah dibuat."
+                    : "Registration successful! Your account has been created.");
+                
+                document.getElementById("apiRegUser").value = "";
+                document.getElementById("apiRegEmail").value = "";
+                document.getElementById("apiRegPass").value = "";
+                
+                // 4. Sinkronisasi Data Sesi dan Buka Modal Profil
+                await withTimeout(
+                    syncProfileFromFirestore(uid),
+                    5000,
+                    "Timeout: Gagal memuat ulang profil. Silakan refresh halaman."
+                );
+                listenSaldo(uid);
+                bukaModalProfil();
+
             } catch(e) {
-                alert(e.message || (currentLang === 'ID' ? "Gagal daftar ke Firebase." : "Firebase register failed."));
+                console.error("Register Error:", e);
+                let msg = e.message;
+                
+                if (e.code === 'auth/email-already-in-use') msg = currentLang === 'ID' ? 'Email sudah terdaftar. Silakan gunakan email lain atau login.' : 'Email already in use.';
+                else if (e.code === 'auth/weak-password') msg = currentLang === 'ID' ? 'Password terlalu lemah (min. 6 karakter).' : 'Password is too weak.';
+                else if (e.code === 'permission-denied') msg = currentLang === 'ID' ? 'Akses ditolak oleh sistem keamanan database (Permission Denied).' : 'Permission denied by database.';
+                else if (msg && msg.includes("Timeout")) msg = currentLang === 'ID' ? msg : 'Connection timeout. Please try again.';
+                
+                alert(msg || (currentLang === 'ID' ? "Gagal daftar ke Firebase." : "Firebase register failed."));
             } finally {
                 isManualAuthSwap = false; // Release FLAG
                 if (btn) {
@@ -1715,27 +1784,71 @@
             }
 
             try {
-                isManualAuthSwap = true; // FLAG - Mencegah Listener Ghost & Bentrok Anonymous Auth yang menyebabkan delay panjang
+                isManualAuthSwap = true; // FLAG - Mencegah Listener Ghost & Bentrok Anonymous Auth
 
-                const data = await firebaseLogin(userOrEmail, pass);
-                if(data.success && data.user) {
-                    const sessionData = {
-                        userId: data.user.userId,
-                        username: data.user.username,
-                        email: data.user.email,
-                        pic: data.user.pic || '',
-                        balance: Number(data.user.balance || 0),
-                        role: data.user.role || 'user'
-                    };
-                    saveSessionProfile(sessionData);
-                    listenSaldo(sessionData.userId);
+                const withTimeout = (promise, ms, errorMsg) => {
+                    let timer;
+                    const timeoutPromise = new Promise((_, reject) => {
+                        timer = setTimeout(() => reject(new Error(errorMsg)), ms);
+                    });
+                    return Promise.race([promise, timeoutPromise]).finally(() => clearTimeout(timer));
+                };
+
+                let loginEmail = userOrEmail;
+                
+                // Jika input berupa Username (tidak ada simbol '@'), cari emailnya di Firestore
+                if (!userOrEmail.includes('@')) {
+                    const userSnap = await withTimeout(
+                        db.collection('users').where('usernameLower', '==', userOrEmail.toLowerCase()).limit(1).get({ source: 'server' }),
+                        7000,
+                        "Timeout: Gagal menghubungi server untuk cek Username."
+                    );
+                    if (userSnap.empty) {
+                        throw new Error(currentLang === 'ID' ? "Username tidak ditemukan." : "Username not found.");
+                    }
+                    loginEmail = userSnap.docs[0].data().email;
+                }
+
+                // Unsubscribe Listener Saldo Lama
+                if (saldoUnsubscribe) {
+                    try { saldoUnsubscribe(); } catch(e){}
+                    saldoUnsubscribe = null;
+                }
+
+                // 1. Eksekusi Login Firebase
+                const userCred = await withTimeout(
+                    auth.signInWithEmailAndPassword(loginEmail, pass),
+                    10000,
+                    "Timeout: Proses login Firebase memakan waktu terlalu lama."
+                );
+                const uid = userCred.user.uid;
+
+                // 2. Tarik Data Profil dari Firestore & Simpan ke Sesi Lokal
+                isExplicitLogout = false; // Reset status manual logout
+                const profile = await withTimeout(
+                    syncProfileFromFirestore(uid),
+                    5000,
+                    "Timeout: Gagal memuat data profil dari server."
+                );
+                
+                if (profile) {
+                    saveSessionProfile(profile);
+                    listenSaldo(uid);
                     updateSidebarUI(); 
                     bukaModalProfil(); 
                 } else {
-                    alert(currentLang === 'ID' ? "Username/Email atau Password salah!" : "Incorrect Username/Email or Password!");
+                    throw new Error("Data profil tidak ditemukan di database.");
                 }
+
             } catch(e) {
-                alert(e.message || (currentLang === 'ID' ? "Login Firebase gagal." : "Firebase login failed."));
+                console.error("Login Error:", e);
+                let msg = e.message;
+                if (e.code === 'auth/invalid-credential' || e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password') {
+                    msg = currentLang === 'ID' ? "Username/Email atau Password salah!" : "Incorrect Username/Email or Password!";
+                } else if (msg && msg.includes("Timeout")) {
+                    msg = currentLang === 'ID' ? msg : 'Connection timeout. Please try again.';
+                }
+                alert(msg || (currentLang === 'ID' ? "Login Firebase gagal." : "Firebase login failed."));
             } finally {
                 isManualAuthSwap = false; // Release FLAG
                 if (btn) {
@@ -1775,7 +1888,11 @@
                     toggleLinkMode(false); 
 
                 } catch (e) {
-                    alert(e.message || (currentLang === 'ID' ? "Gagal mengaitkan akun." : "Failed to link account."));
+                    console.error("Link Account Error:", e);
+                    let msg = e.message;
+                    if (e.code === 'auth/email-already-in-use') msg = currentLang === 'ID' ? 'Email sudah digunakan.' : 'Email already in use.';
+                    else if (e.code === 'auth/weak-password') msg = currentLang === 'ID' ? 'Password terlalu lemah.' : 'Password is too weak.';
+                    alert(msg || (currentLang === 'ID' ? "Gagal mengaitkan akun." : "Failed to link account."));
                 } finally {
                     if(btn) { btn.innerText = oldText; btn.disabled = false; }
                 }
@@ -1783,13 +1900,17 @@
         }
 
         async function prosesLogout() {
+            isExplicitLogout = true; // FLAG - Mencegah auto-generate guest account segera setelah manual logout
             const user = auth.currentUser;
             
             if (user && user.isAnonymous) {
                 const confirmDelete = confirm(currentLang === 'ID' 
                     ? "Logout dari sesi Guest akan menghapus data Anda secara permanen. Lanjutkan?" 
                     : "Logging out from a Guest session will delete your data permanently. Continue?");
-                if (!confirmDelete) return;
+                if (!confirmDelete) {
+                    isExplicitLogout = false;
+                    return;
+                }
 
                 try {
                     await db.collection('users').doc(user.uid).delete();
@@ -2192,6 +2313,7 @@ let saldoUnsubscribe = null;
 
 // VARIABEL GLOBAL UNTUK MENCEGAH BENTROK ANONYMOUS AUTH KETIKA LOGIN MANUAL BERJALAN
 let isManualAuthSwap = false; 
+let isExplicitLogout = false; // FLAG - Mencegah loop akun guest otomatis sesaat setelah di-logout 
 
 // ================= FIREBASE UTILITIES =================
 function getSessionProfile() {
@@ -2215,8 +2337,6 @@ async function getUserDocByIdentifier(identifier) {
     const key = (identifier || '').toString().trim().toLowerCase();
     if (!key) return null;
 
-    // --- PERBAIKAN OPTIMASI: Jalankan Query secara paralel (Promise.all) ---
-    // Menghemat hingga 2-3 detik waktu tunggu dibandingkan eksekusi berurutan
     try {
         const [byUid, emailSnap, usernameSnap] = await Promise.all([
             db.collection('users').doc(key).get().catch(() => ({ exists: false })),
@@ -2292,24 +2412,6 @@ async function ensureUserDoc(uid, payload) {
     return ref;
 }
 
-async function setUserBalance(uid, amount) {
-    const cleanAmount = Number(amount) || 0;
-    if (!uid || cleanAmount < 0) return false;
-
-    await db.runTransaction(async (trx) => {
-        const ref = db.collection('users').doc(uid);
-        const snap = await trx.get(ref);
-        if (!snap.exists) throw new Error('User not found');
-        const current = Number(snap.data().balance || 0);
-        trx.update(ref, {
-            balance: current + cleanAmount,
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-    });
-
-    return true;
-}
-
 async function changeUserBalance(uid, delta) {
     const amount = Number(delta) || 0;
     if (!uid || amount === 0) return false;
@@ -2328,88 +2430,6 @@ async function changeUserBalance(uid, delta) {
     });
 
     return true;
-}
-
-async function adminTambahSaldoFirebase(identifier, amount) {
-    const cleanAmount = Number(amount) || 0;
-    if (cleanAmount <= 0) throw new Error('Nominal tidak valid');
-
-    const userDoc = await getUserDocByIdentifier(identifier);
-    if (!userDoc) throw new Error('Pelanggan tidak ditemukan');
-
-    await changeUserBalance(userDoc.id, cleanAmount);
-    await recordHistory(userDoc.data.username || userDoc.data.email || userDoc.id, `Top Up Saldo Admin`, cleanAmount, 'Sukses');
-    await syncProfileFromFirestore(userDoc.id);
-    return true;
-}
-
-async function firebaseRegister(username, email, password) {
-    const cleanUsername = (username || '').trim();
-    const cleanEmail = (email || '').trim().toLowerCase();
-    const cleanPassword = (password || '').trim();
-
-    if (!cleanUsername || !cleanEmail || !cleanPassword) {
-        throw new Error('Data register belum lengkap');
-    }
-
-    const duplicateUsername = await db.collection('users').where('usernameLower', '==', cleanUsername.toLowerCase()).limit(1).get();
-    if (!duplicateUsername.empty) {
-        throw new Error('Username sudah dipakai');
-    }
-
-    const duplicateEmail = await db.collection('users').where('emailLower', '==', cleanEmail).limit(1).get();
-    if (!duplicateEmail.empty) {
-        throw new Error('Email sudah terdaftar');
-    }
-
-    const userCred = await auth.createUserWithEmailAndPassword(cleanEmail, cleanPassword);
-    const uid = userCred.user.uid;
-
-    await ensureUserDoc(uid, {
-        username: cleanUsername,
-        email: cleanEmail,
-        balance: 0,
-        pic: '',
-        role: 'user'
-    });
-
-    return { success: true, user: { userId: uid, username: cleanUsername, email: cleanEmail, balance: 0, pic: '' } };
-}
-
-async function firebaseLogin(identifier, password) {
-    const key = (identifier || '').trim();
-    const pass = (password || '').trim();
-
-    if (!key || !pass) {
-        throw new Error('Email/username dan password wajib diisi');
-    }
-
-    let emailToUse = key;
-    if (!key.includes('@')) {
-        const userDoc = await getUserDocByIdentifier(key);
-        if (!userDoc || !userDoc.data.email) {
-            throw new Error('Akun tidak ditemukan');
-        }
-        emailToUse = userDoc.data.email;
-    }
-
-    // --- PERBAIKAN UTAMA: Cegah Ghost Listener yang membekukan request backend ---
-    // Mematikan listener Firestore *sebelum* memanggil token login auth baru.
-    if (saldoUnsubscribe) {
-        try { saldoUnsubscribe(); } catch(e){}
-        saldoUnsubscribe = null;
-    }
-
-    const userCred = await auth.signInWithEmailAndPassword(emailToUse, pass);
-    const uid = userCred.user.uid;
-    const profile = await syncProfileFromFirestore(uid);
-
-    if (!profile) {
-        await ensureUserDoc(uid, { email: userCred.user.email || emailToUse, username: key.includes('@') ? (key.split('@')[0] || 'User') : key });
-        return { success: true, user: await syncProfileFromFirestore(uid) };
-    }
-
-    return { success: true, user: profile };
 }
 
 function listenSaldo(uid) {
@@ -2442,12 +2462,11 @@ function listenSaldo(uid) {
 auth.onAuthStateChanged(async (user) => {
     try {
         if (user) {
-            // --- PERBAIKAN: Jika user sedang proses login email, hindari double fetch ---
-            // firebaseLogin() sudah memanggil sync data.
+            // Mencegah tarik data/listener salah sasaran jika fungsi Register/Login manual sedang memproses Auth Swap
             if (!isManualAuthSwap) {
                 await syncProfileFromFirestore(user.uid);
+                listenSaldo(user.uid);
             }
-            listenSaldo(user.uid);
         } else {
             if (saldoUnsubscribe) {
                 try { saldoUnsubscribe(); } catch (e) {}
@@ -2455,10 +2474,8 @@ auth.onAuthStateChanged(async (user) => {
             }
             clearSessionProfile();
             
-            // --- PERBAIKAN UTAMA: Mencegah Race Condition Anonymous Sign In ---
-            // Jika proses sign-out ini terpicu karena proses "perpindahan manual ke akun email",
-            // kita MENCEGAH Firebase membuat akun Guest agar request network tidak bentrok.
-            if (isManualAuthSwap) return;
+            // --- LOGIKA UTAMA: Mencegah Generate Guest Saat Pergantian / Setelah Logout ---
+            if (isManualAuthSwap || isExplicitLogout) return;
 
             // --- FITUR BARU: OTOMATIS LOGIN GUEST / ANONYMOUS AUTH ---
             try {
@@ -2478,7 +2495,7 @@ auth.onAuthStateChanged(async (user) => {
     } catch (e) {
         console.error('Auth listener error:', e);
     } finally {
-        if (typeof updateSidebarUI === 'function') {
+        if (!isManualAuthSwap && typeof updateSidebarUI === 'function') {
             updateSidebarUI();
         }
     }
