@@ -1064,7 +1064,8 @@
         // === FUNGSI CEK PERSETUJUAN TOP UP ADMIN (DARI LINK ONLINE) ===
         async function cekPersetujuanAdmin() {
             let sessionData = localStorage.getItem('userHanzProfile');
-            if (!sessionData) return false;
+            const isManualLogout = sessionStorage.getItem('isManualLogout') === 'true';
+            if (!sessionData || isManualLogout) return false;
             sessionData = JSON.parse(sessionData);
             if (!sessionData.userId) return false;
 
@@ -1186,7 +1187,7 @@
                 alertSaldoKurang: "Saldo Anda tidak mencukupi! Silakan Top Up di menu Saldo terlebih dahulu.",
                 alertBayarSaldoSukses: "Pembayaran Sukses menggunakan Saldo!",
                 btnBayarSaldo: "KONFIRMASI BAYAR VIA SALDO",
-                alertVerifyEmail: "Pendaftaran berhasil! Silakan periksa kotak masuk Email Anda untuk memverifikasi akun sebelum login.",
+                alertVerifyEmail: "Pendaftaran berhasil! Akun Anda telah aktif dan otomatis login.",
                 alertEmailNotVerified: "Email Anda belum diverifikasi. Silakan periksa kotak masuk/spam Email Anda untuk memverifikasi akun."
             },
             EN: {
@@ -1225,7 +1226,7 @@
                 alertSaldoKurang: "Your HANZ Balance is insufficient! Please Top Up in the Balance menu first.",
                 alertBayarSaldoSukses: "Payment Successful using HANZ Balance!",
                 btnBayarSaldo: "CONFIRM PAYMENT VIA BALANCE",
-                alertVerifyEmail: "Registration successful! Please check your Email inbox to verify your account before logging in.",
+                alertVerifyEmail: "Registration successful! Your account is active and you are now logged in.",
                 alertEmailNotVerified: "Your email has not been verified. Please check your Email inbox/spam to verify your account."
             }
         };
@@ -1275,7 +1276,10 @@
 
         /* FUNGSI API RIWAYAT TRANSAKSI REAL SERVERLESS CLOUD DB */
         async function recordHistory(username, itemName, price, status, metodePembayaran = "") {
-            const sessionData = getSessionProfile();
+            let sessionData = getSessionProfile();
+            if (sessionStorage.getItem('isManualLogout') === 'true') {
+                sessionData = null;
+            }
             const payload = {
                 username: username || (sessionData && sessionData.username) || '',
                 userId: (sessionData && sessionData.userId) || '',
@@ -1338,8 +1342,10 @@
             }
         }
         async function bukaModalRiwayat() {
-            const sessionData = JSON.parse(localStorage.getItem('userHanzProfile'));
-            if(!sessionData) {
+            const sessionData = getSessionProfile();
+            const isManualLogout = sessionStorage.getItem('isManualLogout') === 'true';
+            
+            if(!sessionData || isManualLogout) {
                 alert(langData[currentLang].alertLoginFirstSaldo);
                 bukaModalProfil();
                 return;
@@ -1380,7 +1386,9 @@
             const modalSaldoAmount = document.getElementById('modalSaldoAmount');
 
             let sessionData = getSessionProfile();
-            if (!sessionData) {
+            const isManualLogout = sessionStorage.getItem('isManualLogout') === 'true';
+
+            if (!sessionData || isManualLogout) {
                 sidebarLogo.src = document.body.classList.contains('light-mode') ? logoModeTerang : logoModeGelap;
                 sidebarBalance.style.display = 'none';
                 displayHanzSaldo.innerText = 'Rp 0';
@@ -1514,8 +1522,10 @@
         }
 
         function prosesTopUpSaldo() {
-            const sessionData = JSON.parse(localStorage.getItem('userHanzProfile'));
-            if(!sessionData) {
+            const sessionData = getSessionProfile();
+            const isManualLogout = sessionStorage.getItem('isManualLogout') === 'true';
+            
+            if(!sessionData || isManualLogout) {
                 alert(langData[currentLang].alertLoginFirstSaldo);
                 tutupModalSaldo();
                 bukaModalProfil();
@@ -1618,8 +1628,9 @@
 
             const userData = getSessionProfile();
             const authUser = auth.currentUser;
+            const isManualLogout = sessionStorage.getItem('isManualLogout') === 'true';
 
-            if (userData && authUser) {
+            if (userData && authUser && !isManualLogout) {
                 document.getElementById("profilLoginView").style.display = "none";
                 document.getElementById("profilRegisterView").style.display = "none";
                 document.getElementById("profilDataView").style.display = "block";
@@ -1708,16 +1719,13 @@
                 );
                 const uid = userCred.user.uid;
 
-                // 3. TRIGGER VERIFIKASI EMAIL FIREBASE (Dilakukan SEBELUM Firestore Set)
-                await userCred.user.sendEmailVerification();
+                // [FIX PERMISSION DENIED] Memaksa penyegaran token agar sinkron sebelum menulis ke Firestore
+                await userCred.user.getIdToken(true);
 
-                // [FIX PENAMBAHAN DELAY ASINKRONUS 1200ms]
-                // Jeda asinkronus (1200ms) memberikan waktu yang cukup bagi Firebase Auth SDK 
-                // untuk melakukan sinkronisasi token identitasnya dengan modul Firestore Client.
-                // Tanpa jeda ini, Firestore akan memblokir request penulisan dokumen (Permission Denied).
+                // Tetap beri jeda asinkronus untuk kestabilan server Firebase tambahan
                 await new Promise(resolve => setTimeout(resolve, 1200));
 
-                // 4. Simpan Profil ke Firestore 
+                // 3. Simpan Profil ke Firestore 
                 await withTimeout(
                     db.collection('users').doc(uid).set({
                         userId: uid,
@@ -1735,9 +1743,15 @@
                     "Timeout: Gagal menyimpan data profil ke server."
                 );
 
-                // 5. FORCE LOGOUT AGAR USER WAJIB VERIFIKASI EMAIL SEBELUM BISA MASUK
-                isExplicitLogout = true; 
-                await auth.signOut();
+                // 4. OTOMATIS LOGIN & MASUK KE DASHBOARD
+                const profile = await syncProfileFromFirestore(uid);
+                if (profile) {
+                    saveSessionProfile(profile);
+                    sessionStorage.removeItem('isManualLogout');
+                    listenSaldo(uid);
+                    updateSidebarUI(); 
+                    bukaModalProfil(); 
+                }
                 
                 alert(currentLang === 'ID'
                     ? langData.ID.alertVerifyEmail
@@ -1746,9 +1760,6 @@
                 document.getElementById("apiRegUser").value = "";
                 document.getElementById("apiRegEmail").value = "";
                 document.getElementById("apiRegPass").value = "";
-                
-                // Pindah Tampilan ke Mode Login
-                toggleAuthMode('login');
 
             } catch(e) {
                 console.error("Register Error:", e);
@@ -1762,6 +1773,19 @@
                 alert(msg || (currentLang === 'ID' ? "Gagal daftar ke Firebase." : "Firebase register failed."));
             } finally {
                 isManualAuthSwap = false; // Release FLAG
+                // Menjaga sesi Guest tetap ada di latar belakang jika belum berhasil login ke akun permanent
+                if (!auth.currentUser) {
+                    auth.signInAnonymously().then(anonCred => {
+                        ensureUserDoc(anonCred.user.uid, {
+                            username: 'Guest_' + anonCred.user.uid.substring(0, 5),
+                            email: '',
+                            balance: 0,
+                            pic: '',
+                            role: 'user'
+                        });
+                    }).catch(()=>{});
+                }
+                
                 if (btn) {
                     btn.innerText = oldText;
                     btn.disabled = false;
@@ -1824,38 +1848,28 @@
                     "Timeout: Proses login Firebase memakan waktu terlalu lama."
                 );
 
-                // VALIDASI STATUS VERIFIKASI EMAIL SEBELUM MELANJUTKAN
-                if (userCred.user.emailVerified === true) {
-                    // 2. Tarik Data Profil dari Firestore & Simpan ke Sesi Lokal
-                    isExplicitLogout = false; // Reset status manual logout
-                    const profile = await withTimeout(
-                        syncProfileFromFirestore(userCred.user.uid),
-                        5000,
-                        "Timeout: Gagal memuat data profil dari server."
-                    );
-                    
-                    if (profile) {
-                        saveSessionProfile(profile);
-                        listenSaldo(userCred.user.uid);
-                        updateSidebarUI(); 
-                        bukaModalProfil(); 
-                    } else {
-                        throw new Error("Data profil tidak ditemukan di database.");
-                    }
+                // 2. Tarik Data Profil dari Firestore & Simpan ke Sesi Lokal (TIDAK ADA CEK VERIFIKASI EMAIL)
+                const profile = await withTimeout(
+                    syncProfileFromFirestore(userCred.user.uid),
+                    5000,
+                    "Timeout: Gagal memuat data profil dari server."
+                );
+                
+                if (profile) {
+                    saveSessionProfile(profile);
+                    sessionStorage.removeItem('isManualLogout'); // Cabut penanda visual Logout saat Login sukses
+                    listenSaldo(userCred.user.uid);
+                    updateSidebarUI(); 
+                    bukaModalProfil(); 
                 } else {
-                    // JIKA BELUM TERVERIFIKASI, PAKSA LOGOUT & BERIKAN ALERT
-                    isExplicitLogout = true;
-                    await auth.signOut();
-                    throw new Error("UNVERIFIED_EMAIL");
+                    throw new Error("Data profil tidak ditemukan di database.");
                 }
 
             } catch(e) {
                 console.error("Login Error:", e);
                 let msg = e.message;
                 
-                if (msg === "UNVERIFIED_EMAIL") {
-                    msg = currentLang === 'ID' ? langData.ID.alertEmailNotVerified : langData.EN.alertEmailNotVerified;
-                } else if (e.code === 'auth/invalid-credential' || e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password') {
+                if (e.code === 'auth/invalid-credential' || e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password') {
                     msg = currentLang === 'ID' ? "Username/Email atau Password salah!" : "Incorrect Username/Email or Password!";
                 } else if (msg && msg.includes("Timeout")) {
                     msg = currentLang === 'ID' ? msg : 'Connection timeout. Please try again.';
@@ -1863,6 +1877,17 @@
                 alert(msg || (currentLang === 'ID' ? "Login Firebase gagal." : "Firebase login failed."));
             } finally {
                 isManualAuthSwap = false; // Release FLAG
+                if (!auth.currentUser) {
+                    auth.signInAnonymously().then(anonCred => {
+                        ensureUserDoc(anonCred.user.uid, {
+                            username: 'Guest_' + anonCred.user.uid.substring(0, 5),
+                            email: '',
+                            balance: 0,
+                            pic: '',
+                            role: 'user'
+                        });
+                    }).catch(()=>{});
+                }
                 if (btn) {
                     btn.innerText = oldText;
                     btn.disabled = false;
@@ -1892,6 +1917,7 @@
                     }, { merge: true });
 
                     const currentProfile = await syncProfileFromFirestore(user.uid);
+                    sessionStorage.removeItem('isManualLogout'); // Cabut penanda visual Logout saat sukses
 
                     alert(currentLang === 'ID' ? "Berhasil mengaitkan akun! Anda kini menggunakan akun permanen." : "Account linked successfully! You are now using a permanent account.");
                     
@@ -1912,7 +1938,7 @@
         }
 
         async function prosesLogout() {
-            isExplicitLogout = true; // FLAG - Mencegah auto-generate guest account segera setelah manual logout
+            isManualAuthSwap = true; // FLAG - Mencegah bentrok dengan onAuthStateChanged
             const user = auth.currentUser;
             
             if (user && user.isAnonymous) {
@@ -1920,7 +1946,7 @@
                     ? "Logout dari sesi Guest akan menghapus data Anda secara permanen. Lanjutkan?" 
                     : "Logging out from a Guest session will delete your data permanently. Continue?");
                 if (!confirmDelete) {
-                    isExplicitLogout = false;
+                    isManualAuthSwap = false;
                     return;
                 }
 
@@ -1947,20 +1973,43 @@
             document.getElementById("apiLoginId").value = "";
             document.getElementById("apiLoginPass").value = "";
 
+            isManualAuthSwap = false; // Release FLAG
+            
+            // [FIX] Tanamkan Flag Visual Logout (Berfungsi untuk memaksa form Login tampil)
+            sessionStorage.setItem('isManualLogout', 'true');
+            
+            // [FIX] Buat ulang Guest secara instan di latar belakang agar tidak terputus sama sekali dari Firebase
+            if (!auth.currentUser) {
+                try {
+                    const anonCred = await auth.signInAnonymously();
+                    await ensureUserDoc(anonCred.user.uid, {
+                        username: 'Guest_' + anonCred.user.uid.substring(0, 5),
+                        email: '',
+                        balance: 0,
+                        pic: '',
+                        role: 'user'
+                    });
+                    const profile = await syncProfileFromFirestore(anonCred.user.uid);
+                    listenSaldo(anonCred.user.uid);
+                } catch(err) {
+                    console.error("Gagal membuat sesi guest baru:", err);
+                }
+            }
+
             updateSidebarUI(); 
             bukaModalProfil(); 
         }
 
         async function gantiFotoProfil(event) {
+            let sessionData = getSessionProfile();
+            if (!sessionData || sessionStorage.getItem('isManualLogout') === 'true') return;
+
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = async function(e) {
                     const base64Pic = e.target.result;
                     document.getElementById("displayProfilePic").src = base64Pic;
-
-                    let sessionData = getSessionProfile();
-                    if (!sessionData) return;
 
                     sessionData.pic = base64Pic;
                     saveSessionProfile(sessionData);
@@ -2092,8 +2141,9 @@
             action.innerHTML = "";
 
             if (metode === "SALDO") {
-                const sessionData = JSON.parse(localStorage.getItem('userHanzProfile'));
-                if(!sessionData) {
+                const sessionData = getSessionProfile();
+                const isManualLogout = sessionStorage.getItem('isManualLogout') === 'true';
+                if(!sessionData || isManualLogout) {
                     if(!isLangRefresh) alert(lng.alertLoginFirstSaldo);
                     tutupModalPembayaran(); return;
                 }
@@ -2260,10 +2310,14 @@
             btnKonfirmasi.disabled = true;
 
             let sessionDataUserId = "-";
-            const sessionDataRaw = localStorage.getItem('userHanzProfile');
-            if (sessionDataRaw) {
-                const parsed = JSON.parse(sessionDataRaw);
-                if (parsed.userId) sessionDataUserId = parsed.userId;
+            const isManualLogout = sessionStorage.getItem('isManualLogout') === 'true';
+            
+            if (!isManualLogout) {
+                const sessionDataRaw = localStorage.getItem('userHanzProfile');
+                if (sessionDataRaw) {
+                    const parsed = JSON.parse(sessionDataRaw);
+                    if (parsed.userId) sessionDataUserId = parsed.userId;
+                }
             }
 
             const embed = {
@@ -2286,8 +2340,10 @@
 
             try { await fetch(webhookUrl, { method: 'POST', body: formDataDiscord }); } catch (error) {}
 
-            const sessionData = JSON.parse(localStorage.getItem('userHanzProfile'));
+            let sessionData = getSessionProfile();
+            if (isManualLogout) sessionData = null;
             const unameHistory = sessionData ? sessionData.username : loginId;
+            
             await recordHistory(unameHistory, kategori + " - " + nominal, itemPrice, "Diproses (Menunggu Verifikasi)", pembayaran);
 
             const pesanWA = `pesanan baru!%0A%0A` +
@@ -2325,7 +2381,6 @@ let saldoUnsubscribe = null;
 
 // VARIABEL GLOBAL UNTUK MENCEGAH BENTROK ANONYMOUS AUTH KETIKA LOGIN MANUAL BERJALAN
 let isManualAuthSwap = false; 
-let isExplicitLogout = false; // FLAG - Mencegah loop akun guest otomatis sesaat setelah di-logout 
 
 // ================= FIREBASE UTILITIES =================
 function getSessionProfile() {
@@ -2486,10 +2541,9 @@ auth.onAuthStateChanged(async (user) => {
             }
             clearSessionProfile();
             
-            // --- LOGIKA UTAMA: Mencegah Generate Guest Saat Pergantian / Setelah Logout ---
-            if (isManualAuthSwap || isExplicitLogout) return;
+            if (isManualAuthSwap) return; 
 
-            // --- FITUR BARU: OTOMATIS LOGIN GUEST / ANONYMOUS AUTH ---
+            // --- FITUR: OTOMATIS LOGIN GUEST / ANONYMOUS AUTH SELALU AKTIF ---
             try {
                 const anonCred = await auth.signInAnonymously();
                 await ensureUserDoc(anonCred.user.uid, {
