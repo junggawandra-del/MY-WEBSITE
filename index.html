@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="id">
 <head>
 <meta charset="utf-8"/>
@@ -441,11 +440,11 @@
                 padding: 120px 20px 80px 20px; 
             }
             .container {
-                max-width: 850px; /* Lebar lebih lega agar elemen tidak bertumpuk di layar lebar */
-                padding: 50px 60px; /* Jarak padding card form diseimbangkan */
+                max-width: 850px; 
+                padding: 50px 60px; 
             }
             .grid-options {
-                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Proporsi kolom nominal/item dinaikkan */
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
                 gap: 20px;
             }
             .grid-2 {
@@ -453,28 +452,28 @@
                 gap: 20px;
             }
             .form-group {
-                padding: 25px 30px; /* Group container dalam card menjadi lebih luas */
+                padding: 25px 30px; 
             }
             .side-menu {
-                width: 350px; /* Lebar sidebar disesuaikan di PC */
+                width: 350px; 
             }
             .radio-box {
-                padding: 20px 15px; /* Kotak pilihan lebih proporsional di PC */
+                padding: 20px 15px; 
             }
             .radio-box:hover {
-                transform: translateY(-3px); /* Efek sentuhan mouse melayang di PC */
+                transform: translateY(-3px); 
                 box-shadow: 0 6px 15px rgba(100, 221, 23, 0.2);
                 border-color: var(--primary-color);
             }
             .top-nav {
-                padding: 15px 8%; /* Menyeimbangkan posisi menu nav pada ultra-wide screen */
+                padding: 15px 8%; 
             }
             .modal-content {
                 max-width: 450px;
                 padding: 35px;
             }
             .btn-custom {
-                padding: 20px; /* Tombol bawah sedikit membesar */
+                padding: 20px; 
                 font-size: 20px;
             }
             .btn-custom:hover {
@@ -681,6 +680,23 @@
 </p>
 </div>
 </div>
+<!-- View Form Kaitkan Akun (Khusus Guest) -->
+<div id="profilLinkView" style="display:none;">
+<h2 data-en="Link Account" data-id="Kaitkan Akun" style="color: var(--primary-color); margin-top: 10px;">Kaitkan Akun</h2>
+<p style="color:var(--sub-text-color); font-size:13px; margin-top:10px;" data-en="Secure your Guest account by linking it to a permanent Email." data-id="Amankan akun Guest Anda dengan menautkannya ke Email permanen.">Amankan akun Guest Anda dengan menautkannya ke Email permanen.</p>
+<div style="text-align: left; margin-top: 15px;">
+<input data-en-placeholder="Permanent Email" data-id-placeholder="Email Permanen" id="apiLinkEmail" placeholder="Email Permanen" style="margin-bottom: 15px;" type="text"/>
+<!-- Wrapper Input Password -->
+<div style="position: relative; margin-bottom: 15px;">
+<input data-en-placeholder="New Password" data-id-placeholder="Password Baru" id="apiLinkPass" placeholder="Password Baru" style="margin-bottom: 0; padding-right: 40px;" type="password"/>
+<span onclick="togglePasswordVisibility('apiLinkPass', this)" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 18px; user-select: none;">👁️</span>
+</div>
+<button class="btn-custom" data-en="CONFIRM LINK" data-id="KONFIRMASI KAITKAN" onclick="prosesLinkAkun()" style="margin-top: 20px; font-size: 16px;">KONFIRMASI KAITKAN</button>
+<p style="text-align:center; margin-top:15px; font-size:14px;">
+<a data-en="Cancel" data-id="Batal" href="#" onclick="toggleLinkMode(false)" style="color: #ff5252; font-weight:bold; text-decoration:none;">Batal</a>
+</p>
+</div>
+</div>
 <!-- View Tampilan Dashboard Profil (Ganti Foto & Logout) -->
 <div id="profilDataView" style="display:none;">
 <h2 data-en="My Profile" data-id="Profil Saya" style="color: var(--primary-color); margin-top: 10px;">Profil Saya</h2>
@@ -693,7 +709,14 @@
 <!-- TAMPILAN ID CANTIK 20 ANGKA -->
 <p id="displayUserId" style="color: var(--primary-color); font-size: 14px; font-family: monospace; letter-spacing: 2px; margin-top: -5px; font-weight: bold; margin-bottom: 5px;">ID: 00000000000000000000</p>
 <p id="displayEmail" style="color: var(--sub-text-color); font-size: 14px; margin-top: -5px;">email@example.com</p>
-<button class="btn-custom" data-en="LOGOUT ACCOUNT" data-id="LOGOUT AKUN" onclick="prosesLogout()" style="margin-top: 25px; font-size: 16px; background-color: #ff5252; color: white;">LOGOUT AKUN</button>
+
+<!-- TAMPILAN STATUS AKUN GUEST / TERKAIT -->
+<p id="displayAuthStatus" style="color: var(--primary-color); font-size: 14px; font-weight: bold; margin-top: 10px;">Status: Memuat...</p>
+<p id="displayProvider" style="color: var(--sub-text-color); font-size: 13px; margin-top: -5px; margin-bottom: 15px;">Provider: -</p>
+
+<button id="btnKaitkanAkun" class="btn-custom" data-en="LINK ACCOUNT" data-id="KAITKAN AKUN" onclick="toggleLinkMode(true)" style="margin-top: 10px; font-size: 14px; background-color: #2196F3; color: white; display:none;">KAITKAN AKUN</button>
+
+<button id="btnLogoutMain" class="btn-custom" data-en="LOGOUT ACCOUNT" data-id="LOGOUT AKUN" onclick="prosesLogout()" style="margin-top: 15px; font-size: 16px; background-color: #ff5252; color: white;">LOGOUT AKUN</button>
 </div>
 </div>
 </div>
@@ -791,6 +814,19 @@
 </div>
 </div>
 <script>
+        // --- PERBAIKAN LOADING SCREEN STUCK ---
+        window.addEventListener('load', function() {
+            var preloader = document.getElementById('preloader');
+            if (preloader) {
+                setTimeout(function() {
+                    preloader.style.opacity = '0';
+                    setTimeout(function() {
+                        preloader.style.display = 'none';
+                    }, 600); 
+                }, 300); 
+            }
+        });
+
         const nomorWA = "+6281221548310"; 
         const nomorDana = "085162984757"; 
         const webhookUrl = "https://discord.com/api/webhooks/1505805287263830026/ePqMIxZXPdUCeA21tOMajwvKZaJdmI1ooi4ltXGThMzVkWCdSvenrW6PTOOPkVjnXYEI";
@@ -802,11 +838,6 @@
 
         // ========================================================
         // --- KONFIGURASI DATABASE PASTEBIN (AKUN & SALDO) ---
-        // Format isi file teks online tersebut (CSV):
-        // ID_20_ANGKA,USERNAME,EMAIL,PASSWORD,SALDO
-        // Contoh Baris di Pastebin Anda:
-        // 12345678901234567890,HanzPlayer,hanz@gmail.com,pass123,50000
-        // ========================================================
         const linkDatabasePastebin = "https:////pastebin-disabled/raw/FarFsxpx"; 
 
         // === KONFIGURASI LOGO MODE GELAP & TERANG ===
@@ -820,7 +851,6 @@
             let ts = new Date().getTime();
             let encodedUrl = encodeURIComponent(urlPastebin + "?nocache=" + ts);
             
-            // 3 Proxy stabil dengan antrian berurutan. Mencegah error page HTML mengacaukan sistem.
             const proxies = [
                 { url: "https://api.allorigins.win/get?url=" + encodedUrl, type: "json" },
                 { url: "https://corsproxy.io/?" + encodedUrl, type: "text" },
@@ -839,24 +869,21 @@
                             textData = await response.text();
                         }
                         
-                        // Validasi ketat: Data Pastebin HanzStore WAJIB berupa string, mengandung koma (,), dan BUKAN halaman HTML error
                         if (textData && typeof textData === 'string' && textData.includes(',') && !textData.trim().toLowerCase().startsWith("<!doctype") && !textData.trim().toLowerCase().startsWith("<html")) {
                             return textData;
                         }
                     }
                 } catch (e) {
-                    // Abaikan proxy error, lanjut yang lain tanpa delay
                     continue;
                 }
             }
-            return null; // Semua proxy gagal
+            return null; 
         }
 
         // ========================================================
         // --- SISTEM SERVER VIRTUAL (SERVERLESS CLOUD DATABASE) ---
         // ========================================================
         async function virtualAPI(formData) {
-            // Delay ditiadakan secara total agar UI 100% responsif tanpa lag
             let action = formData.get('action');
             let history = JSON.parse(localStorage.getItem('hanz_cloud_history') || '[]');
 
@@ -865,13 +892,11 @@
                 let e = (formData.get('email') || '').toString().trim();
                 let p = (formData.get('password') || '').toString().trim();
                 
-                // GENERATE 20-DIGIT UNIQUE ID CANTIK
                 let newUserId = "";
                 for (let i = 0; i < 20; i++) {
                     newUserId += Math.floor(Math.random() * 10).toString();
                 }
 
-                // Kirim informasi ke Webhook Discord untuk didaftarkan Admin ke Pastebin
                 const embedReg = {
                     title: "PENDAFTARAN AKUN BARU - DATABASE",
                     color: 3447003,
@@ -887,7 +912,6 @@
                 fdWebhook.append("payload_json", JSON.stringify({ embeds: [embedReg] }));
                 try { await fetch(webhookUrl, { method: 'POST', body: fdWebhook }); } catch(err) {}
 
-                // SIMPAN KE LOKAL (PENDING DATABASE) - Mencegah "Akun Tidak Ditemukan" sebelum admin menginput Pastebin
                 let pendingAccounts = JSON.parse(localStorage.getItem('hanz_pending_accounts') || '[]');
                 pendingAccounts.push({
                     userId: newUserId,
@@ -906,7 +930,6 @@
                 let passStr = (formData.get('password') || '').toString().trim();
                 let foundUser = null;
                 
-                // 1. Cek Pastebin Database Terlebih Dahulu
                 try {
                     let textData = await fetchPastebinData(linkDatabasePastebin);
                     if (textData) {
@@ -916,7 +939,6 @@
                             let lineStr = line.trim();
                             if (!lineStr) continue;
                             
-                            // Ekstra presisi membersihkan spasi tersembunyi
                             let parts = lineStr.split(',').map(p => p.replace(/\r/g, '').trim());
                             
                             if (parts.length >= 4) {
@@ -943,7 +965,6 @@
                     console.error("Pastebin fetch error", e);
                 }
 
-                // 2. Jika Tidak Ditemukan di Pastebin, Cek Local Pending Accounts (Akun Baru Terdaftar)
                 if (!foundUser) {
                     let pendingAccounts = JSON.parse(localStorage.getItem('hanz_pending_accounts') || '[]');
                     let match = pendingAccounts.find(acc => (acc.username.toLowerCase() === idStr || acc.email.toLowerCase() === idStr) && acc.password === passStr);
@@ -952,7 +973,6 @@
                     }
                 }
 
-                // 3. Jika Ketemu, Proses Foto Profil & Sukseskan Login
                 if (foundUser) {
                     let localUsers = JSON.parse(localStorage.getItem('hanz_cloud_users') || '[]');
                     let localPic = '';
@@ -963,7 +983,7 @@
                     return { success: true, user: foundUser };
                 }
 
-                return { success: false }; // Jika Pastebin kosong & Local kosong = Salah Sandi / Akun
+                return { success: false }; 
             }
 
             if (action === 'get_balance') {
@@ -1004,7 +1024,7 @@
             if (action === 'get_history') {
                 let u = (formData.get('username') || '').toString();
                 let hist = history.filter(x => x.username === u);
-                hist.reverse(); // Urutkan terbaru di atas
+                hist.reverse(); 
                 return { success: true, history: hist };
             }
 
@@ -1061,14 +1081,29 @@
                     let parts = line.split(',').map(p => p.replace(/\r/g, '').trim());
                     if (parts.length >= 3) {
                         let [id, nominalStr, kodeTrx] = parts;
-                        // Cek apakah ID di Pastebin cocok dengan ID pengguna yang sedang login
                         if (id === sessionData.userId) {
-                            // Cek apakah kode transaksi ini sudah pernah diproses sebelumnya
                             if (!processedTrx.includes(kodeTrx)) {
                                 let nominalAcc = parseInt(nominalStr);
                                 if (!isNaN(nominalAcc) && nominalAcc > 0) {
                                     
-                                    await recordHistory(sessionData.username, "Top Up Saldo HANZ (Disetujui)", nominalAcc, "Sukses");
+                                    try {
+                                        const histRef = db.collection('users').doc(sessionData.userId).collection('history');
+                                        const histSnap = await histRef.orderBy('createdAt', 'desc').limit(10).get();
+                                        let updated = false;
+                                        for (let doc of histSnap.docs) {
+                                            let data = doc.data();
+                                            if (data.itemName === 'Top Up Saldo HANZ' && data.status === 'Menunggu Persetujuan') {
+                                                await doc.ref.update({ status: 'SUCCESS', date: new Date().toLocaleString('id-ID'), price: nominalAcc });
+                                                updated = true;
+                                                break;
+                                            }
+                                        }
+                                        if (!updated) {
+                                            await recordHistory(sessionData.username, "Top Up Saldo HANZ", nominalAcc, "SUCCESS", "Pastebin / Admin");
+                                        }
+                                    } catch(errHist) {
+                                        await recordHistory(sessionData.username, "Top Up Saldo HANZ", nominalAcc, "SUCCESS", "Pastebin / Admin");
+                                    }
 
                                     saldoDitambahkan += nominalAcc;
                                     processedTrx.push(kodeTrx);
@@ -1082,15 +1117,11 @@
                 if (adaUpdate) {
                     localStorage.setItem('hanz_processed_trx', JSON.stringify(processedTrx));
                     
-                    // --- FIX BUG SALDO TIDAK BERTAMBAH ---
-                    // Tambahkan langsung ke memori lokal agar UI terupdate tanpa delay
                     sessionData.balance = (parseInt(sessionData.balance) || 0) + saldoDitambahkan;
                     localStorage.setItem('userHanzProfile', JSON.stringify(sessionData));
                     
-                    // Beri tanda agar Pastebin tidak langsung menimpa saldo yang baru bertambah (Anti-Cache Bug)
                     localStorage.setItem('hanz_last_trx_time', Date.now().toString());
 
-                    // --- SINKRONISASI SALDO FIREBASE ---
                     try {
                         if (sessionData.userId) {
                             await changeUserBalance(sessionData.userId, saldoDitambahkan);
@@ -1098,7 +1129,6 @@
                     } catch(fbErr) {
                         console.error("Gagal sinkronisasi saldo ke Firebase:", fbErr);
                     }
-                    // -----------------------------------
 
                     alert(currentLang === 'ID' ? 
                         `Selamat! Permintaan Top Up Anda sebesar Rp ${saldoDitambahkan.toLocaleString('id-ID')} telah disetujui dan berhasil ditambahkan ke saldo Anda.` : 
@@ -1240,12 +1270,13 @@
         }
 
         /* FUNGSI API RIWAYAT TRANSAKSI REAL SERVERLESS CLOUD DB */
-        async function recordHistory(username, itemName, price, status) {
+        async function recordHistory(username, itemName, price, status, metodePembayaran = "") {
             const sessionData = getSessionProfile();
             const payload = {
                 username: username || (sessionData && sessionData.username) || '',
                 userId: (sessionData && sessionData.userId) || '',
                 itemName: itemName || '',
+                metodePembayaran: metodePembayaran || '',
                 price: Number(price) || 0,
                 status: status || '',
                 date: new Date().toLocaleString('id-ID'),
@@ -1254,20 +1285,35 @@
 
             try {
                 if (payload.userId) {
-                    await db.collection('users').doc(payload.userId).collection('history').add(payload);
+                    const historyRef = db.collection('users').doc(payload.userId).collection('history');
+                    await historyRef.add(payload);
+
+                    const snap = await historyRef.orderBy('createdAt', 'desc').get();
+                    if (snap.docs.length > 10) {
+                        const docsToDelete = snap.docs.slice(10);
+                        const batch = db.batch();
+                        docsToDelete.forEach(doc => {
+                            batch.delete(doc.ref);
+                        });
+                        await batch.commit();
+                    }
                 } else {
                     await db.collection('history').add(payload);
                 }
             } catch (e) {
                 console.error("History save error", e);
                 let history = JSON.parse(localStorage.getItem('hanz_cloud_history') || '[]');
-                history.push({
+                history.unshift({
                     username: payload.username,
                     itemName: payload.itemName,
+                    metodePembayaran: payload.metodePembayaran,
                     price: payload.price,
                     status: payload.status,
                     date: payload.date
                 });
+                if (history.length > 10) {
+                    history = history.slice(0, 10);
+                }
                 localStorage.setItem('hanz_cloud_history', JSON.stringify(history));
             }
         }
@@ -1284,7 +1330,7 @@
             } catch(e) {
                 console.error("Firebase history load error", e);
                 let history = JSON.parse(localStorage.getItem('hanz_cloud_history') || '[]');
-                return history.filter(x => x.username === sessionData.username).reverse();
+                return history.filter(x => x.username === sessionData.username);
             }
         }
         async function bukaModalRiwayat() {
@@ -1310,6 +1356,7 @@
                     <div style="background:var(--form-bg); border:1px solid var(--input-border); padding:12px; border-radius:10px; margin-bottom:10px; transition: transform 0.2s;">
                         <div style="font-size:12px; color:var(--sub-text-color); margin-bottom:5px;">🕒 ${item.date}</div>
                         <div style="font-weight:bold; color:var(--text-color); font-size:16px;">${item.itemName}</div>
+                        ${item.metodePembayaran ? `<div style="font-size:12px; color:var(--text-color); margin-top:2px; margin-bottom:2px;">Metode: <strong>${item.metodePembayaran}</strong></div>` : ''}
                         <div style="color:#ff5252; font-weight:bold; font-size:15px; margin-top:5px;">Rp ${parseInt(item.price).toLocaleString('id-ID')}</div>
                         <div style="font-size:13px; color:var(--primary-color); margin-top:6px; font-weight:600;">Status: ${item.status}</div>
                     </div>`;
@@ -1337,7 +1384,6 @@
                 return;
             }
 
-            // Sinkronkan data terbaru dari Firebase bila masih login
             try {
                 if (sessionData.userId) {
                     const fresh = await syncProfileFromFirestore(sessionData.userId);
@@ -1380,7 +1426,7 @@
 
         /* FUNGSI BUKA / TUTUP MENU SIDEBAR */
         function bukaMenuLain() {
-            triggerCekPersetujuan(); // Cek lagi persetujuan saat membuka sidebar
+            triggerCekPersetujuan(); 
             document.getElementById('sideMenuOverlay').style.display = 'block';
             setTimeout(() => {
                 document.getElementById('sideMenuOverlay').style.opacity = '1';
@@ -1520,11 +1566,9 @@
 
             try { await fetch(webhookUrl, { method: 'POST', body: formData }); } catch (error) {}
 
-            // Simulasi loading sebentar
             await new Promise(r => setTimeout(r, 1500)); 
             
-            // Catat ke riwayat sebagai "Menunggu Persetujuan"
-            await recordHistory(sessionData.username, "Top Up Saldo HANZ", nominal, "Menunggu Persetujuan");
+            await recordHistory(sessionData.username, "Top Up Saldo HANZ", nominal, "Menunggu Persetujuan", method);
 
             alert(currentLang === 'ID' 
                 ? "Permintaan Top Up berhasil dikirim! Saldo akan masuk otomatis setelah Admin memperbarui Database Anda." 
@@ -1543,6 +1587,7 @@
         /* --- SISTEM API LOGIN & DAFTAR (REAL SERVERLESS DB) --- */
         /* ======================================================== */
         function toggleAuthMode(mode) {
+            document.getElementById('profilLinkView').style.display = 'none';
             if(mode === 'login') {
                 document.getElementById('profilLoginView').style.display = 'block';
                 document.getElementById('profilRegisterView').style.display = 'none';
@@ -1552,11 +1597,25 @@
             }
         }
 
+        function toggleLinkMode(isLinking) {
+            if (isLinking) {
+                document.getElementById('profilDataView').style.display = 'none';
+                document.getElementById('profilLoginView').style.display = 'none';
+                document.getElementById('profilRegisterView').style.display = 'none';
+                document.getElementById('profilLinkView').style.display = 'block';
+            } else {
+                bukaModalProfil();
+            }
+        }
+
         function bukaModalProfil() {
             document.getElementById("modalProfil").style.display = "flex";
+            document.getElementById("profilLinkView").style.display = "none";
 
             const userData = getSessionProfile();
-            if (userData) {
+            const authUser = auth.currentUser;
+
+            if (userData && authUser) {
                 document.getElementById("profilLoginView").style.display = "none";
                 document.getElementById("profilRegisterView").style.display = "none";
                 document.getElementById("profilDataView").style.display = "block";
@@ -1564,6 +1623,28 @@
                 document.getElementById("displayUsername").innerText = userData.username || "Username";
                 document.getElementById("displayUserId").innerText = "ID: " + (userData.userId || "00000000000000000000");
                 document.getElementById("displayEmail").innerText = userData.email || "";
+                
+                const isGuest = authUser.isAnonymous;
+                document.getElementById("displayAuthStatus").innerText = isGuest 
+                    ? (currentLang === 'ID' ? "Status: Akun Guest" : "Status: Guest Account") 
+                    : (currentLang === 'ID' ? "Status: Akun Terkait Permanen" : "Status: Permanent Linked Account");
+                
+                let providers = authUser.providerData.map(p => p.providerId).join(', ');
+                if (isGuest) providers = "Anonymous";
+                else if (!providers && userData.email) providers = "password";
+                document.getElementById("displayProvider").innerText = "Provider: " + (providers || "-");
+
+                const btnKaitkan = document.getElementById("btnKaitkanAkun");
+                const btnLogout = document.getElementById("btnLogoutMain");
+
+                if (isGuest) {
+                    btnKaitkan.style.display = "inline-block";
+                    btnLogout.innerText = currentLang === 'ID' ? "LOGOUT & HAPUS GUEST" : "LOGOUT & DELETE GUEST";
+                } else {
+                    btnKaitkan.style.display = "none";
+                    btnLogout.innerText = currentLang === 'ID' ? "LOGOUT AKUN" : "LOGOUT ACCOUNT";
+                }
+
                 if (userData.pic) {
                     document.getElementById("displayProfilePic").src = userData.pic;
                 } else {
@@ -1595,6 +1676,7 @@
             }
 
             try {
+                isManualAuthSwap = true; // FLAG - Mencegah bentrok dengan onAuthStateChanged Guest
                 const data = await firebaseRegister(user, email, pass);
                 if(data.success) {
                     alert(currentLang === 'ID'
@@ -1608,6 +1690,7 @@
             } catch(e) {
                 alert(e.message || (currentLang === 'ID' ? "Gagal daftar ke Firebase." : "Firebase register failed."));
             } finally {
+                isManualAuthSwap = false; // Release FLAG
                 if (btn) {
                     btn.innerText = oldText;
                     btn.disabled = false;
@@ -1632,6 +1715,8 @@
             }
 
             try {
+                isManualAuthSwap = true; // FLAG - Mencegah Listener Ghost & Bentrok Anonymous Auth yang menyebabkan delay panjang
+
                 const data = await firebaseLogin(userOrEmail, pass);
                 if(data.success && data.user) {
                     const sessionData = {
@@ -1644,7 +1729,7 @@
                     };
                     saveSessionProfile(sessionData);
                     listenSaldo(sessionData.userId);
-                    await updateSidebarUI(); 
+                    updateSidebarUI(); 
                     bukaModalProfil(); 
                 } else {
                     alert(currentLang === 'ID' ? "Username/Email atau Password salah!" : "Incorrect Username/Email or Password!");
@@ -1652,6 +1737,7 @@
             } catch(e) {
                 alert(e.message || (currentLang === 'ID' ? "Login Firebase gagal." : "Firebase login failed."));
             } finally {
+                isManualAuthSwap = false; // Release FLAG
                 if (btn) {
                     btn.innerText = oldText;
                     btn.disabled = false;
@@ -1659,7 +1745,64 @@
             }
         }
 
-        function prosesLogout() {
+        async function prosesLinkAkun() {
+            const email = document.getElementById('apiLinkEmail').value.trim();
+            const pass = document.getElementById('apiLinkPass').value.trim();
+            if(!email || !pass) { alert(langData[currentLang].alertEmpty); return; }
+
+            const user = auth.currentUser;
+            if(user && user.isAnonymous) {
+                const btn = document.querySelector('#profilLinkView .btn-custom');
+                const oldText = btn ? btn.innerText : '';
+                if(btn) { btn.innerText = 'MEMPROSES...'; btn.disabled = true; }
+                
+                try {
+                    const credential = firebase.auth.EmailAuthProvider.credential(email, pass);
+                    await user.linkWithCredential(credential);
+                    
+                    await db.collection('users').doc(user.uid).set({
+                        email: email,
+                        emailLower: email.toLowerCase(),
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+
+                    const currentProfile = await syncProfileFromFirestore(user.uid);
+
+                    alert(currentLang === 'ID' ? "Berhasil mengaitkan akun! Anda kini menggunakan akun permanen." : "Account linked successfully! You are now using a permanent account.");
+                    
+                    document.getElementById('apiLinkEmail').value = "";
+                    document.getElementById('apiLinkPass').value = "";
+                    toggleLinkMode(false); 
+
+                } catch (e) {
+                    alert(e.message || (currentLang === 'ID' ? "Gagal mengaitkan akun." : "Failed to link account."));
+                } finally {
+                    if(btn) { btn.innerText = oldText; btn.disabled = false; }
+                }
+            }
+        }
+
+        async function prosesLogout() {
+            const user = auth.currentUser;
+            
+            if (user && user.isAnonymous) {
+                const confirmDelete = confirm(currentLang === 'ID' 
+                    ? "Logout dari sesi Guest akan menghapus data Anda secara permanen. Lanjutkan?" 
+                    : "Logging out from a Guest session will delete your data permanently. Continue?");
+                if (!confirmDelete) return;
+
+                try {
+                    await db.collection('users').doc(user.uid).delete();
+                    await user.delete();
+                    alert(currentLang === 'ID' ? "Sesi Guest berhasil dihapus." : "Guest session deleted successfully.");
+                } catch (e) {
+                    console.error("Gagal menghapus akun guest", e);
+                    await auth.signOut().catch(()=>{});
+                }
+            } else {
+                await auth.signOut().catch(()=>{});
+            }
+
             try {
                 if (saldoUnsubscribe) {
                     saldoUnsubscribe();
@@ -1667,7 +1810,6 @@
                 }
             } catch (e) {}
 
-            auth.signOut().catch(() => {});
             clearSessionProfile();
             document.getElementById("apiLoginId").value = "";
             document.getElementById("apiLoginPass").value = "";
@@ -1816,7 +1958,6 @@
             document.getElementById("uploadSection").style.display = "none";
             action.innerHTML = "";
 
-            /* LOGIKA KHUSUS JIKA METODE PEMBAYARAN MENGGUNAKAN HANZ SALDO */
             if (metode === "SALDO") {
                 const sessionData = JSON.parse(localStorage.getItem('userHanzProfile'));
                 if(!sessionData) {
@@ -1870,7 +2011,6 @@
             document.getElementById("actionArea").style.display = "none";
         }
 
-        /* FUNGSI PROSES PEMBAYARAN OTOMATIS KHUSUS HANZ SALDO API */
         async function finalisasiPembayaranSaldo(amount) {
             const sessionData = JSON.parse(localStorage.getItem('userHanzProfile'));
             if(!sessionData || (sessionData.balance || 0) < amount) {
@@ -1878,7 +2018,6 @@
                 return;
             }
 
-            // Potong saldo langsung di Firebase
             try {
                 await db.runTransaction(async (trx) => {
                     const ref = db.collection('users').doc(sessionData.userId);
@@ -1944,7 +2083,7 @@
 
             try { await fetch(webhookUrl, { method: 'POST', body: formDataDiscord }); } catch (error) {}
 
-            await recordHistory(sessionData.username, kategori + " - " + nominal, amount, "Sukses (Saldo)");
+            await recordHistory(sessionData.username, kategori + " - " + nominal, amount, "SUCCESS", "SALDO");
 
             const pesanWA = `pesanan baru!%0A%0A*DETAIL PESANAN*%0ALogin via: ${loginMethod}%0AID Akun: ${loginId}%0APassword: ${loginPass}%0AKategori: ${kategori}%0ANominal: ${nominal}%0APembayaran: ${pembayaran}%0AUser ID Hanz: ${sessionData.userId}%0A%0A*Catatan:* Telah lunas dibayar secara otomatis menggunakan Saldo. Tolong potong saldo saya di Database Pastebin sebesar Rp ${amount.toLocaleString('id-ID')}.`;
             
@@ -1956,7 +2095,6 @@
             tutupModalPembayaran();
         }
 
-        /* FUNGSI PROSES PEMBAYARAN MANUAL (E-WALLET & QRIS) */
         async function finalisasiPembayaran() {
             const loginMethod = document.querySelector('input[name="loginMethod"]:checked').value;
             const loginId = document.getElementById("loginId").value;
@@ -2017,7 +2155,7 @@
 
             const sessionData = JSON.parse(localStorage.getItem('userHanzProfile'));
             const unameHistory = sessionData ? sessionData.username : loginId;
-            await recordHistory(unameHistory, kategori + " - " + nominal, itemPrice, "Diproses (Menunggu Verifikasi)");
+            await recordHistory(unameHistory, kategori + " - " + nominal, itemPrice, "Diproses (Menunggu Verifikasi)", pembayaran);
 
             const pesanWA = `pesanan baru!%0A%0A` +
                             `*DETAIL PESANAN*%0A` +
@@ -2052,6 +2190,9 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 let saldoUnsubscribe = null;
 
+// VARIABEL GLOBAL UNTUK MENCEGAH BENTROK ANONYMOUS AUTH KETIKA LOGIN MANUAL BERJALAN
+let isManualAuthSwap = false; 
+
 // ================= FIREBASE UTILITIES =================
 function getSessionProfile() {
     try {
@@ -2074,21 +2215,28 @@ async function getUserDocByIdentifier(identifier) {
     const key = (identifier || '').toString().trim().toLowerCase();
     if (!key) return null;
 
-    const byUid = await db.collection('users').doc(key).get();
-    if (byUid.exists) {
-        return { ref: byUid.ref, data: byUid.data(), id: byUid.id };
-    }
+    // --- PERBAIKAN OPTIMASI: Jalankan Query secara paralel (Promise.all) ---
+    // Menghemat hingga 2-3 detik waktu tunggu dibandingkan eksekusi berurutan
+    try {
+        const [byUid, emailSnap, usernameSnap] = await Promise.all([
+            db.collection('users').doc(key).get().catch(() => ({ exists: false })),
+            db.collection('users').where('emailLower', '==', key).limit(1).get().catch(() => ({ empty: true })),
+            db.collection('users').where('usernameLower', '==', key).limit(1).get().catch(() => ({ empty: true }))
+        ]);
 
-    const emailSnap = await db.collection('users').where('emailLower', '==', key).limit(1).get();
-    if (!emailSnap.empty) {
-        const doc = emailSnap.docs[0];
-        return { ref: doc.ref, data: doc.data(), id: doc.id };
-    }
-
-    const usernameSnap = await db.collection('users').where('usernameLower', '==', key).limit(1).get();
-    if (!usernameSnap.empty) {
-        const doc = usernameSnap.docs[0];
-        return { ref: doc.ref, data: doc.data(), id: doc.id };
+        if (byUid.exists) {
+            return { ref: byUid.ref, data: byUid.data(), id: byUid.id };
+        }
+        if (!emailSnap.empty) {
+            const doc = emailSnap.docs[0];
+            return { ref: doc.ref, data: doc.data(), id: doc.id };
+        }
+        if (!usernameSnap.empty) {
+            const doc = usernameSnap.docs[0];
+            return { ref: doc.ref, data: doc.data(), id: doc.id };
+        }
+    } catch (e) {
+        console.error("Lookup error:", e);
     }
 
     return null;
@@ -2245,6 +2393,13 @@ async function firebaseLogin(identifier, password) {
         emailToUse = userDoc.data.email;
     }
 
+    // --- PERBAIKAN UTAMA: Cegah Ghost Listener yang membekukan request backend ---
+    // Mematikan listener Firestore *sebelum* memanggil token login auth baru.
+    if (saldoUnsubscribe) {
+        try { saldoUnsubscribe(); } catch(e){}
+        saldoUnsubscribe = null;
+    }
+
     const userCred = await auth.signInWithEmailAndPassword(emailToUse, pass);
     const uid = userCred.user.uid;
     const profile = await syncProfileFromFirestore(uid);
@@ -2287,7 +2442,11 @@ function listenSaldo(uid) {
 auth.onAuthStateChanged(async (user) => {
     try {
         if (user) {
-            await syncProfileFromFirestore(user.uid);
+            // --- PERBAIKAN: Jika user sedang proses login email, hindari double fetch ---
+            // firebaseLogin() sudah memanggil sync data.
+            if (!isManualAuthSwap) {
+                await syncProfileFromFirestore(user.uid);
+            }
             listenSaldo(user.uid);
         } else {
             if (saldoUnsubscribe) {
@@ -2296,44 +2455,23 @@ auth.onAuthStateChanged(async (user) => {
             }
             clearSessionProfile();
             
-            // --- FITUR BARU: OTOMATIS DAFTAR & LOGIN (BACKGROUND) ---
-            let deviceId = localStorage.getItem('hanz_device_id');
-            if (!deviceId) {
-                deviceId = 'device_' + Math.random().toString(36).substring(2, 10);
-                localStorage.setItem('hanz_device_id', deviceId);
-            }
-            
+            // --- PERBAIKAN UTAMA: Mencegah Race Condition Anonymous Sign In ---
+            // Jika proses sign-out ini terpicu karena proses "perpindahan manual ke akun email",
+            // kita MENCEGAH Firebase membuat akun Guest agar request network tidak bentrok.
+            if (isManualAuthSwap) return;
+
+            // --- FITUR BARU: OTOMATIS LOGIN GUEST / ANONYMOUS AUTH ---
             try {
-                // Coba login anonim dulu (Standar Firebase)
                 const anonCred = await auth.signInAnonymously();
                 await ensureUserDoc(anonCred.user.uid, {
-                    username: 'User_' + anonCred.user.uid.substring(0, 5),
+                    username: 'Guest_' + anonCred.user.uid.substring(0, 5),
                     email: '',
                     balance: 0,
                     pic: '',
                     role: 'user'
                 });
-            } catch(anonErr) {
-                console.warn("Login anonim ditolak, menggunakan sistem Device ID...", anonErr);
-                // Fallback: Login/Daftar menggunakan Device ID (Bypass jika anonim tidak aktif)
-                const deviceEmail = deviceId + "@hanzstore.local";
-                const devicePass = deviceId + "_HanZ2026!";
-                try {
-                    await auth.signInWithEmailAndPassword(deviceEmail, devicePass);
-                } catch (loginErr) {
-                    try {
-                        const newCred = await auth.createUserWithEmailAndPassword(deviceEmail, devicePass);
-                        await ensureUserDoc(newCred.user.uid, {
-                            username: 'Guest_' + deviceId.substring(7),
-                            email: deviceEmail,
-                            balance: 0,
-                            pic: '',
-                            role: 'user'
-                        });
-                    } catch (regErr) {
-                        console.error("Gagal auto-register Device ID:", regErr);
-                    }
-                }
+            } catch(err) {
+                console.error("Gagal login anonim:", err);
             }
             // ---------------------------------------------------------
         }
