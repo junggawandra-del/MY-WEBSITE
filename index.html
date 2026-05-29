@@ -1185,7 +1185,9 @@
                 alertLoginFirstSaldo: "Silakan login di menu Profil terlebih dahulu untuk top up atau menggunakan Saldo!",
                 alertSaldoKurang: "Saldo Anda tidak mencukupi! Silakan Top Up di menu Saldo terlebih dahulu.",
                 alertBayarSaldoSukses: "Pembayaran Sukses menggunakan Saldo!",
-                btnBayarSaldo: "KONFIRMASI BAYAR VIA SALDO"
+                btnBayarSaldo: "KONFIRMASI BAYAR VIA SALDO",
+                alertVerifyEmail: "Pendaftaran berhasil! Silakan periksa kotak masuk Email Anda untuk memverifikasi akun sebelum login.",
+                alertEmailNotVerified: "Email Anda belum diverifikasi. Silakan periksa kotak masuk/spam Email Anda untuk memverifikasi akun."
             },
             EN: {
                 pageTitle: "HANZ STORE (hanzstoretwn) | Trusted Township Top Up & Script Service",
@@ -1222,7 +1224,9 @@
                 alertLoginFirstSaldo: "Please login from Profile menu first to top up or use Balance!",
                 alertSaldoKurang: "Your HANZ Balance is insufficient! Please Top Up in the Balance menu first.",
                 alertBayarSaldoSukses: "Payment Successful using HANZ Balance!",
-                btnBayarSaldo: "CONFIRM PAYMENT VIA BALANCE"
+                btnBayarSaldo: "CONFIRM PAYMENT VIA BALANCE",
+                alertVerifyEmail: "Registration successful! Please check your Email inbox to verify your account before logging in.",
+                alertEmailNotVerified: "Your email has not been verified. Please check your Email inbox/spam to verify your account."
             }
         };
 
@@ -1678,8 +1682,6 @@
             try {
                 isManualAuthSwap = true; // FLAG - Mencegah bentrok dengan onAuthStateChanged Guest
 
-                // --- PERBAIKAN: Fungsi Helper Timeout dengan Pembersihan Memori ---
-                // Mencegah timer menggantung di latar belakang yang memblokir eksekusi
                 const withTimeout = (promise, ms, errorMsg) => {
                     let timer;
                     const timeoutPromise = new Promise((_, reject) => {
@@ -1689,7 +1691,6 @@
                 };
 
                 // 1. Validasi Username di Firestore
-                // Menggunakan { source: 'server' } agar gagal cepat (fail-fast) jika offline, daripada macet (stuck).
                 const usernameSnap = await withTimeout(
                     db.collection('users').where('usernameLower', '==', user.toLowerCase()).limit(1).get({ source: 'server' }),
                     7000,
@@ -1699,7 +1700,7 @@
                     throw new Error(currentLang === 'ID' ? "Username sudah digunakan." : "Username already taken.");
                 }
 
-                // 2. Buat Akun Firebase Auth (Otomatis mengecek apakah email sudah terdaftar via Server Firebase)
+                // 2. Buat Akun Firebase Auth
                 const userCred = await withTimeout(
                     auth.createUserWithEmailAndPassword(email, pass),
                     10000,
@@ -1707,11 +1708,16 @@
                 );
                 const uid = userCred.user.uid;
 
-                // DELAY KRUSIAL: Memberikan jeda singkat agar Firebase SDK dapat mensinkronkan 
-                // pergantian token Auth internal dengan instance Firestore.
-                await new Promise(resolve => setTimeout(resolve, 800));
+                // 3. TRIGGER VERIFIKASI EMAIL FIREBASE (Dilakukan SEBELUM Firestore Set)
+                await userCred.user.sendEmailVerification();
 
-                // 3. Simpan Profil ke Firestore
+                // [FIX PENAMBAHAN DELAY ASINKRONUS 1200ms]
+                // Jeda asinkronus (1200ms) memberikan waktu yang cukup bagi Firebase Auth SDK 
+                // untuk melakukan sinkronisasi token identitasnya dengan modul Firestore Client.
+                // Tanpa jeda ini, Firestore akan memblokir request penulisan dokumen (Permission Denied).
+                await new Promise(resolve => setTimeout(resolve, 1200));
+
+                // 4. Simpan Profil ke Firestore 
                 await withTimeout(
                     db.collection('users').doc(uid).set({
                         userId: uid,
@@ -1729,24 +1735,20 @@
                     "Timeout: Gagal menyimpan data profil ke server."
                 );
 
-                isExplicitLogout = false; // Reset status manual logout
+                // 5. FORCE LOGOUT AGAR USER WAJIB VERIFIKASI EMAIL SEBELUM BISA MASUK
+                isExplicitLogout = true; 
+                await auth.signOut();
                 
                 alert(currentLang === 'ID'
-                    ? "Pendaftaran berhasil! Akun Anda telah dibuat."
-                    : "Registration successful! Your account has been created.");
+                    ? langData.ID.alertVerifyEmail
+                    : langData.EN.alertVerifyEmail);
                 
                 document.getElementById("apiRegUser").value = "";
                 document.getElementById("apiRegEmail").value = "";
                 document.getElementById("apiRegPass").value = "";
                 
-                // 4. Sinkronisasi Data Sesi dan Buka Modal Profil
-                await withTimeout(
-                    syncProfileFromFirestore(uid),
-                    5000,
-                    "Timeout: Gagal memuat ulang profil. Silakan refresh halaman."
-                );
-                listenSaldo(uid);
-                bukaModalProfil();
+                // Pindah Tampilan ke Mode Login
+                toggleAuthMode('login');
 
             } catch(e) {
                 console.error("Register Error:", e);
@@ -1821,29 +1823,39 @@
                     10000,
                     "Timeout: Proses login Firebase memakan waktu terlalu lama."
                 );
-                const uid = userCred.user.uid;
 
-                // 2. Tarik Data Profil dari Firestore & Simpan ke Sesi Lokal
-                isExplicitLogout = false; // Reset status manual logout
-                const profile = await withTimeout(
-                    syncProfileFromFirestore(uid),
-                    5000,
-                    "Timeout: Gagal memuat data profil dari server."
-                );
-                
-                if (profile) {
-                    saveSessionProfile(profile);
-                    listenSaldo(uid);
-                    updateSidebarUI(); 
-                    bukaModalProfil(); 
+                // VALIDASI STATUS VERIFIKASI EMAIL SEBELUM MELANJUTKAN
+                if (userCred.user.emailVerified === true) {
+                    // 2. Tarik Data Profil dari Firestore & Simpan ke Sesi Lokal
+                    isExplicitLogout = false; // Reset status manual logout
+                    const profile = await withTimeout(
+                        syncProfileFromFirestore(userCred.user.uid),
+                        5000,
+                        "Timeout: Gagal memuat data profil dari server."
+                    );
+                    
+                    if (profile) {
+                        saveSessionProfile(profile);
+                        listenSaldo(userCred.user.uid);
+                        updateSidebarUI(); 
+                        bukaModalProfil(); 
+                    } else {
+                        throw new Error("Data profil tidak ditemukan di database.");
+                    }
                 } else {
-                    throw new Error("Data profil tidak ditemukan di database.");
+                    // JIKA BELUM TERVERIFIKASI, PAKSA LOGOUT & BERIKAN ALERT
+                    isExplicitLogout = true;
+                    await auth.signOut();
+                    throw new Error("UNVERIFIED_EMAIL");
                 }
 
             } catch(e) {
                 console.error("Login Error:", e);
                 let msg = e.message;
-                if (e.code === 'auth/invalid-credential' || e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password') {
+                
+                if (msg === "UNVERIFIED_EMAIL") {
+                    msg = currentLang === 'ID' ? langData.ID.alertEmailNotVerified : langData.EN.alertEmailNotVerified;
+                } else if (e.code === 'auth/invalid-credential' || e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password') {
                     msg = currentLang === 'ID' ? "Username/Email atau Password salah!" : "Incorrect Username/Email or Password!";
                 } else if (msg && msg.includes("Timeout")) {
                     msg = currentLang === 'ID' ? msg : 'Connection timeout. Please try again.';
