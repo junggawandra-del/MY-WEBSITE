@@ -426,6 +426,7 @@
             position: absolute; top: 10px; right: 15px; font-size: 24px;
             cursor: pointer; color: var(--text-color); font-weight: bold;
             transition: color 0.3s ease;
+            z-index: 99; /* Fix z-index for profile close button */
         }
         
         .close-btn:hover {
@@ -487,6 +488,280 @@
                 margin-bottom: 40px;
             }
         }
+
+        /* ======================================================= */
+        /* --- PREMIUM UI/UX: PROFILE DASHBOARD & BUTTONS --- */
+        /* ======================================================= */
+        
+        /* Dashboard Container with Glassmorphism */
+        #profilDataView {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px; /* Reduced from 25px for tighter look */
+            padding: 20px 15px 15px 15px; /* Significantly reduced to cut whitespace */
+            background: var(--form-bg);
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5), inset 0 0 15px rgba(100, 221, 23, 0.05);
+            z-index: 1;
+            text-align: center;
+            margin-top: 0; /* Cut extra top spacing */
+            
+            /* Anti-Scroll / Static Layout Enforcement */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            box-sizing: border-box;
+            touch-action: none; /* Prevents bouncing/panning on touch devices */
+        }
+
+        /* Video Background Additions */
+        .bg-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+        }
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(18, 18, 18, 0.85); /* Dark overlay to maintain readability */
+            z-index: 1;
+            pointer-events: none;
+        }
+        #profilDataView > *:not(.bg-video):not(.video-overlay) {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Animated Close Button inside Profile Border */
+        @keyframes pulseRotatePause {
+            0%   { transform: scale(1) rotate(0deg); color: var(--text-color); }
+            15%  { transform: scale(1.3) rotate(0deg); color: #ff5252; text-shadow: 0 0 10px #ff5252; }
+            30%  { transform: scale(1) rotate(0deg); color: var(--text-color); text-shadow: none; }
+            60%  { transform: scale(1) rotate(180deg); }
+            80%  { transform: scale(1) rotate(180deg); }
+            100% { transform: scale(1) rotate(360deg); }
+        }
+        .profile-close-btn {
+            position: absolute !important;
+            top: 14px; /* Posisi disesuaikan presisi masuk dalam radius border pojok kanan */
+            right: 14px; /* Posisi disesuaikan presisi masuk dalam radius border pojok kanan */
+            font-size: 34px; /* Scaled up proportionately */
+            cursor: pointer;
+            color: var(--text-color);
+            font-weight: bold;
+            z-index: 100;
+            transition: all 0.3s ease;
+            animation: pulseRotatePause 4s infinite cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 35px; /* Re-proportioned */
+            height: 35px; /* Re-proportioned */
+            line-height: 1;
+        }
+        .profile-close-btn:hover {
+            color: #ff5252;
+            animation-play-state: paused;
+            transform: scale(1.2);
+        }
+
+        /* Encrypted Badge Styles */
+        .encrypted-badge {
+            display: inline-block;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 11px; /* Thinned */
+            font-weight: 900;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: rgba(100, 221, 23, 0.1);
+            border: 1px solid rgba(100, 221, 23, 0.4);
+            padding: 6px 14px; /* Thinned */
+            border-radius: 8px;
+            margin-bottom: 12px; /* Decreased Spacing */
+            box-shadow: 0 0 10px rgba(100, 221, 23, 0.15), inset 0 0 5px rgba(100, 221, 23, 0.1);
+            text-shadow: 0 0 5px rgba(100, 221, 23, 0.4);
+            position: relative;
+            overflow: hidden;
+            width: 90%;
+            box-sizing: border-box;
+        }
+        .encrypted-badge::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(100, 221, 23, 0.3), transparent);
+            animation: scanline 3s infinite linear;
+        }
+        @keyframes scanline {
+            0% { left: -100%; }
+            100% { left: 200%; }
+        }
+
+        /* Animated Glowing Orbs Background */
+        #profilDataView::before,
+        #profilDataView::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(40px);
+            z-index: 1; /* Diubah agar berada di atas video tapi di bawah konten text */
+            animation: floatOrbs 8s ease-in-out infinite alternate;
+            pointer-events: none;
+        }
+        #profilDataView::before {
+            width: 150px;
+            height: 150px;
+            background: rgba(100, 221, 23, 0.15);
+            top: -30px;
+            left: -30px;
+        }
+        #profilDataView::after {
+            width: 120px;
+            height: 120px;
+            background: rgba(33, 150, 243, 0.1);
+            bottom: -20px;
+            right: -20px;
+            animation-delay: -4s;
+        }
+        @keyframes floatOrbs {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, 20px) scale(1.2); }
+        }
+
+        /* Profile Avatar Glow & Polish */
+        .profile-avatar-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 8px; /* Tighter spacing */
+        }
+        .profile-avatar-container img {
+            width: 90px; /* Reduced for compact fit */
+            height: 90px; /* Reduced for compact fit */
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary-color);
+            box-shadow: 0 0 15px rgba(100, 221, 23, 0.5), inset 0 0 10px rgba(0,0,0,0.5);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .profile-avatar-container:hover img {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(100, 221, 23, 0.8);
+        }
+
+        .btn-change-pic {
+            cursor: pointer;
+            color: var(--text-color);
+            font-size: 11px; /* Decreased */
+            font-weight: 700;
+            background: rgba(100, 221, 23, 0.15);
+            padding: 4px 14px; /* Thinned */
+            border-radius: 20px;
+            margin-top: 6px; /* Tighter integration */
+            position: relative;
+            display: inline-block;
+            border: 1px solid rgba(100, 221, 23, 0.4);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            z-index: 2;
+        }
+        .btn-change-pic:hover {
+            background: var(--primary-color);
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(100, 221, 23, 0.3);
+        }
+
+        /* Typography Enhancements */
+        .profile-username {
+            color: var(--text-color);
+            font-size: 20px; /* Decreased for tight fit */
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin: 5px 0 2px 0; /* Compact margins */
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        .profile-uid {
+            background: linear-gradient(90deg, #64dd17, #b2ff59);
+            -webkit-background-clip: text;
+            color: transparent;
+            font-size: 13px; /* Decreased */
+            font-family: 'Courier New', Courier, monospace;
+            letter-spacing: 1px;
+            font-weight: bold;
+            margin-bottom: 5px; /* Compact */
+        }
+        .profile-email {
+            color: var(--sub-text-color);
+            font-size: 12px; /* Decreased */
+            margin-bottom: 8px; /* Compact */
+            background: rgba(0,0,0,0.2);
+            padding: 4px 12px; /* Thinner */
+            border-radius: 20px;
+            display: inline-block;
+        }
+        .profile-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px 12px; /* Thinner */
+            border-radius: 20px;
+            font-size: 11px; /* Thinner */
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: rgba(100, 221, 23, 0.1);
+            border: 1px solid rgba(100, 221, 23, 0.4);
+            color: var(--primary-color);
+            margin: 0; /* Reset for flexbox handling */
+            box-shadow: 0 0 10px rgba(100, 221, 23, 0.1);
+            white-space: nowrap;
+        }
+
+        /* Premium Destructive Button (Logout/Hapus) */
+        .btn-destructive {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            padding: 14px; /* Condensed height */
+            margin-top: 5px; /* Condensed gap */
+            background: linear-gradient(135deg, #2b2b2b, #1a1a1a); /* Dark aesthetic base */
+            color: #ff5252;
+            border: 2px solid #ff5252;
+            border-radius: 12px; /* Tighter radius */
+            font-size: 15px; /* Slightly smaller */
+            font-weight: 800;
+            letter-spacing: 1px;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(255, 82, 82, 0.15);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1;
+        }
+        .btn-destructive:hover {
+            background: linear-gradient(135deg, #ff5252, #d32f2f);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 8px 25px rgba(255, 82, 82, 0.4);
+            transform: translateY(-2px);
+        }
+        .btn-destructive:active {
+            transform: scale(0.93);
+            box-shadow: 0 2px 10px rgba(255, 82, 82, 0.3);
+            background: #b71c1c;
+        }
+
     </style>
 <!-- FIREBASE SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -644,9 +919,10 @@
 <!-- MODAL KHUSUS LOGIN & DAFTAR MENU PROFIL API -->
 <div class="modal-overlay" id="modalProfil">
 <div class="modal-content">
-<span class="close-btn" onclick="tutupModalProfil()">×</span>
 <!-- View Form Login Profil -->
 <div id="profilLoginView">
+<!-- Close button spesifik untuk form login -->
+<span class="close-btn" onclick="tutupModalProfil()">×</span>
 <h2 data-en="Profile Login" data-id="Login Akun Profil" style="color: var(--primary-color); margin-top: 10px;">Login Akun Profil</h2>
 <div style="text-align: left; margin-top: 20px;">
 <input data-en-placeholder="Email / Username" data-id-placeholder="Email / Username" id="apiLoginId" placeholder="Email / Username" style="margin-bottom: 15px;" type="text"/>
@@ -664,6 +940,8 @@
 </div>
 <!-- View Form Daftar / Register Profil -->
 <div id="profilRegisterView" style="display:none;">
+<!-- Close button spesifik untuk form register -->
+<span class="close-btn" onclick="tutupModalProfil()">×</span>
 <h2 data-en="Register New Account" data-id="Daftar Akun Baru" style="color: var(--primary-color); margin-top: 10px;">Daftar Akun Baru</h2>
 <div style="text-align: left; margin-top: 20px;">
 <input data-en-placeholder="Username" data-id-placeholder="Username" id="apiRegUser" placeholder="Username" style="margin-bottom: 15px;" type="text"/>
@@ -680,45 +958,58 @@
 </p>
 </div>
 </div>
-<!-- View Form Kaitkan Akun (Khusus Guest) -->
-<div id="profilLinkView" style="display:none;">
-<h2 data-en="Link Account" data-id="Kaitkan Akun" style="color: var(--primary-color); margin-top: 10px;">Kaitkan Akun</h2>
-<p style="color:var(--sub-text-color); font-size:13px; margin-top:10px;" data-en="Secure your Guest account by linking it to a permanent Email." data-id="Amankan akun Guest Anda dengan menautkannya ke Email permanen.">Amankan akun Guest Anda dengan menautkannya ke Email permanen.</p>
-<div style="text-align: left; margin-top: 15px;">
-<input data-en-placeholder="Permanent Email" data-id-placeholder="Email Permanen" id="apiLinkEmail" placeholder="Email Permanen" style="margin-bottom: 15px;" type="text"/>
-<!-- Wrapper Input Password -->
-<div style="position: relative; margin-bottom: 15px;">
-<input data-en-placeholder="New Password" data-id-placeholder="Password Baru" id="apiLinkPass" placeholder="Password Baru" style="margin-bottom: 0; padding-right: 40px;" type="password"/>
-<span onclick="togglePasswordVisibility('apiLinkPass', this)" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 18px; user-select: none;">👁️</span>
+
+<!-- ========================================================================= -->
+<!-- KODE ASLI DIHAPUS VISUALNYA SESUAI INSTRUKSI NAMUN DOM NODE DIPERTAHANKAN -->
+<!-- AGAR SCRIPT JS AMAN DARI ERROR NULL REFERENCE                           -->
+<!-- ========================================================================= -->
+<div id="profilLinkView" style="display:none !important;">
+    <input id="apiLinkEmail" type="hidden"/>
+    <input id="apiLinkPass" type="hidden"/>
 </div>
-<button class="btn-custom" data-en="CONFIRM LINK" data-id="KONFIRMASI KAITKAN" onclick="prosesLinkAkun()" style="margin-top: 20px; font-size: 16px;">KONFIRMASI KAITKAN</button>
-<p style="text-align:center; margin-top:15px; font-size:14px;">
-<a data-en="Cancel" data-id="Batal" href="#" onclick="toggleLinkMode(false)" style="color: #ff5252; font-weight:bold; text-decoration:none;">Batal</a>
-</p>
-</div>
-</div>
-<!-- View Tampilan Dashboard Profil (Ganti Foto & Logout) -->
+
+<!-- View Tampilan Dashboard Profil Premium (Refactored Glassmorphism & Neon Orbs) -->
 <div id="profilDataView" style="display:none;">
-<h2 data-en="My Profile" data-id="Profil Saya" style="color: var(--primary-color); margin-top: 10px;">Profil Saya</h2>
-<div style="margin-top: 20px; text-align: center;">
-<img id="displayProfilePic" src="https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary-color); margin-bottom: 15px; box-shadow: 0 4px 10px rgba(100, 221, 23, 0.3);"/>
-<br/>
-<label data-en="Change Profile Picture" data-id="Ganti Foto Profil" for="uploadProfilePic" style="cursor: pointer; color: var(--primary-color); font-size: 14px; text-decoration: underline; font-weight: bold;">Ganti Foto Profil</label>
-<input accept="image/*" id="uploadProfilePic" onchange="gantiFotoProfil(event)" style="display: none;" type="file"/>
-<h3 id="displayUsername" style="margin-top: 15px; color: var(--text-color); font-size: 20px; letter-spacing: 1px;">Username</h3>
-<!-- TAMPILAN ID CANTIK 20 ANGKA -->
-<p id="displayUserId" style="color: var(--primary-color); font-size: 14px; font-family: monospace; letter-spacing: 2px; margin-top: -5px; font-weight: bold; margin-bottom: 5px;">ID: 00000000000000000000</p>
-<p id="displayEmail" style="color: var(--sub-text-color); font-size: 14px; margin-top: -5px;">email@example.com</p>
 
-<!-- TAMPILAN STATUS AKUN GUEST / TERKAIT -->
-<p id="displayAuthStatus" style="color: var(--primary-color); font-size: 14px; font-weight: bold; margin-top: 10px;">Status: Memuat...</p>
-<p id="displayProvider" style="color: var(--sub-text-color); font-size: 13px; margin-top: -5px; margin-bottom: 15px;">Provider: -</p>
+    <!-- PENAMBAHAN BACKGROUND VIDEO LIVE -->
+    <video class="bg-video" autoplay loop muted playsinline>
+        <source src="https://files.catbox.moe/4d9xtb.mp4" type="video/mp4">
+    </video>
+    <!-- Overlay agar video tidak menyilaukan dan text tetap terbaca jelas -->
+    <div class="video-overlay"></div>
 
-<button id="btnKaitkanAkun" class="btn-custom" data-en="LINK ACCOUNT" data-id="KAITKAN AKUN" onclick="toggleLinkMode(true)" style="margin-top: 10px; font-size: 14px; background-color: #2196F3; color: white; display:none;">KAITKAN AKUN</button>
+    <!-- TOMBOL CLOSE INDEPENDEN DI DALAM BORDER KONTAINER PROFIL (DENGAN ANIMASI) -->
+    <span class="profile-close-btn" onclick="tutupModalProfil()">×</span>
 
-<button id="btnLogoutMain" class="btn-custom" data-en="LOGOUT ACCOUNT" data-id="LOGOUT AKUN" onclick="prosesLogout()" style="margin-top: 15px; font-size: 16px; background-color: #ff5252; color: white;">LOGOUT AKUN</button>
+    <h2 data-en="My Profile" data-id="Profil Saya" style="color: var(--primary-color); margin-top: 0; margin-bottom: 12px; font-size: 22px; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); z-index: 2;">Profil Saya</h2>
+    
+    <div class="profile-avatar-container">
+        <img id="displayProfilePic" src="https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png" alt="Profile"/>
+        <label data-en="Change Profile Picture" data-id="Ganti Foto Profil" for="uploadProfilePic" class="btn-change-pic">Ganti Foto Profil</label>
+        <input accept="image/*" id="uploadProfilePic" onchange="gantiFotoProfil(event)" style="display: none;" type="file"/>
+    </div>
+
+    <h3 id="displayUsername" class="profile-username">Username</h3>
+    <p id="displayUserId" class="profile-uid">ID: 00000000000000000000</p>
+    <p id="displayEmail" class="profile-email">email@example.com</p>
+
+    <div style="margin-top: 0; margin-bottom: 12px; display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; width: 100%;">
+        <span id="displayAuthStatus" class="profile-badge">Status: Memuat...</span>
+        <span id="displayProvider" class="profile-badge" style="border-color: rgba(33, 150, 243, 0.4); color: #2196F3; background: rgba(33, 150, 243, 0.1);">Provider: -</span>
+    </div>
+
+    <!-- INDIKATOR STATUS AKUN TERENKRIPSI (FUTURISTIC NEON) -->
+    <div class="encrypted-badge">
+        <span data-en="Status: Secured &amp; Encrypted Connection" data-id="Status Akun: Terenkripsi Aman">Status Akun: Terenkripsi Aman</span> 🔒
+    </div>
+
+    <!-- Hidden element to preserve JS bindings perfectly -->
+    <button id="btnKaitkanAkun" style="display:none !important;"></button>
+
+    <button id="btnLogoutMain" class="btn-destructive" data-en="LOGOUT ACCOUNT" data-id="LOGOUT AKUN" onclick="prosesLogout()">LOGOUT AKUN</button>
 </div>
-</div>
+<!-- ========================================================================= -->
+
 </div>
 </div>
 <!-- MODAL KHUSUS INFORMASI & TOP UP SALDO -->
@@ -1613,7 +1904,7 @@
         /* --- SISTEM API LOGIN & DAFTAR (REAL SERVERLESS DB) --- */
         /* ======================================================== */
         function toggleAuthMode(mode) {
-            document.getElementById('profilLinkView').style.display = 'none';
+            document.getElementById('profilLinkView').style.display = 'none !important';
             if(mode === 'login') {
                 document.getElementById('profilLoginView').style.display = 'block';
                 document.getElementById('profilRegisterView').style.display = 'none';
@@ -1636,7 +1927,7 @@
 
         function bukaModalProfil() {
             document.getElementById("modalProfil").style.display = "flex";
-            document.getElementById("profilLinkView").style.display = "none";
+            document.getElementById("profilLinkView").style.display = "none !important";
 
             const userData = getSessionProfile();
             const authUser = auth.currentUser;
@@ -1645,7 +1936,7 @@
             if (userData && authUser && !isManualLogout) {
                 document.getElementById("profilLoginView").style.display = "none";
                 document.getElementById("profilRegisterView").style.display = "none";
-                document.getElementById("profilDataView").style.display = "block";
+                document.getElementById("profilDataView").style.display = "flex";
 
                 document.getElementById("displayUsername").innerText = userData.username || "Username";
                 document.getElementById("displayUserId").innerText = "ID: " + (userData.userId || "00000000000000000000");
