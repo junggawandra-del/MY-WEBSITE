@@ -1396,18 +1396,30 @@
                 return;
             }
 
-            try {
-                if (sessionData.userId) {
-                    const fresh = await syncProfileFromFirestore(sessionData.userId);
-                    if (fresh) sessionData = fresh;
-                }
-            } catch (e) {}
-
-            if (sessionData.pic) {
+            // --- IMPLEMENTASI CACHE OFFLINE INSTAN (MENCEGAH FLICKERING) ---
+            let offlinePic = localStorage.getItem('hanz_offline_pic_' + sessionData.userId);
+            if (offlinePic) {
+                sidebarLogo.src = offlinePic;
+            } else if (sessionData.pic) {
                 sidebarLogo.src = sessionData.pic;
+                localStorage.setItem('hanz_offline_pic_' + sessionData.userId, sessionData.pic);
             } else {
                 sidebarLogo.src = document.body.classList.contains('light-mode') ? logoModeTerang : logoModeGelap;
             }
+
+            try {
+                if (sessionData.userId) {
+                    const fresh = await syncProfileFromFirestore(sessionData.userId);
+                    if (fresh) {
+                        sessionData = fresh;
+                        // Sinkronisasi pembaruan dari Firebase ke Offline Cache
+                        if (fresh.pic) {
+                            localStorage.setItem('hanz_offline_pic_' + sessionData.userId, fresh.pic);
+                            sidebarLogo.src = fresh.pic; 
+                        }
+                    }
+                }
+            } catch (e) {}
 
             const currentBalance = Number(sessionData.balance || 0);
             sidebarBalance.innerText = 'Rp ' + currentBalance.toLocaleString('id-ID');
@@ -1660,8 +1672,13 @@
                     btnLogout.innerText = currentLang === 'ID' ? "LOGOUT AKUN" : "LOGOUT ACCOUNT";
                 }
 
-                if (userData.pic) {
+                // --- IMPLEMENTASI CACHE OFFLINE INSTAN (MENCEGAH FLICKERING) ---
+                let offlinePic = localStorage.getItem('hanz_offline_pic_' + userData.userId);
+                if (offlinePic) {
+                    document.getElementById("displayProfilePic").src = offlinePic;
+                } else if (userData.pic) {
                     document.getElementById("displayProfilePic").src = userData.pic;
+                    localStorage.setItem('hanz_offline_pic_' + userData.userId, userData.pic);
                 } else {
                     document.getElementById("displayProfilePic").src = document.body.classList.contains('light-mode') ? logoModeTerang : logoModeGelap;
                 }
@@ -1940,7 +1957,9 @@
         async function prosesLogout() {
             isManualAuthSwap = true; // FLAG - Mencegah bentrok dengan onAuthStateChanged
             const user = auth.currentUser;
-            
+            let sessionData = getSessionProfile();
+            let currentUid = user ? user.uid : (sessionData ? sessionData.userId : null);
+
             if (user && user.isAnonymous) {
                 const confirmDelete = confirm(currentLang === 'ID' 
                     ? "Logout dari sesi Guest akan menghapus data Anda secara permanen. Lanjutkan?" 
@@ -1968,6 +1987,11 @@
                     saldoUnsubscribe = null;
                 }
             } catch (e) {}
+
+            // --- TAMBAHAN CACHE OFFLINE: Bersihkan cache gambar terkait saat logout ---
+            if (currentUid) {
+                localStorage.removeItem('hanz_offline_pic_' + currentUid);
+            }
 
             clearSessionProfile();
             document.getElementById("apiLoginId").value = "";
@@ -2010,6 +2034,9 @@
                 reader.onload = async function(e) {
                     const base64Pic = e.target.result;
                     document.getElementById("displayProfilePic").src = base64Pic;
+
+                    // --- TAMBAHAN CACHE OFFLINE: Update ke penyimpanan lokal untuk pemuatan cepat di masa depan ---
+                    localStorage.setItem('hanz_offline_pic_' + sessionData.userId, base64Pic);
 
                     sessionData.pic = base64Pic;
                     saveSessionProfile(sessionData);
@@ -2444,6 +2471,12 @@ async function syncProfileFromFirestore(uid) {
         role: data.role || 'user'
     };
     saveSessionProfile(profile);
+
+    // --- TAMBAHAN CACHE OFFLINE: Simpan gambar juga di cache khusus ---
+    if (profile.pic) {
+        localStorage.setItem('hanz_offline_pic_' + uid, profile.pic);
+    }
+
     return profile;
 }
 
@@ -2518,6 +2551,12 @@ function listenSaldo(uid) {
         session.pic = data.pic || session.pic || '';
         session.balance = Number(data.balance || 0);
         session.role = data.role || session.role || 'user';
+
+        // --- TAMBAHAN CACHE OFFLINE: Perbarui cache saat ada sinyal dari Firebase ---
+        if (session.pic) {
+            localStorage.setItem('hanz_offline_pic_' + uid, session.pic);
+        }
+
         saveSessionProfile(session);
 
         if (typeof updateSidebarUI === 'function') {
