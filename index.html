@@ -1105,17 +1105,26 @@
 </div>
 </div>
 <script>
-        // --- PERBAIKAN LOADING SCREEN STUCK ---
-        window.addEventListener('load', function() {
+        // --- PERBAIKAN LOADING SCREEN STUCK (OPTIMASI FAIL-SAFE & DOMContentLoaded) ---
+        function removePreloaderSafe() {
             var preloader = document.getElementById('preloader');
-            if (preloader) {
+            if (preloader && preloader.style.display !== 'none' && preloader.style.opacity !== '0') {
+                preloader.style.opacity = '0';
                 setTimeout(function() {
-                    preloader.style.opacity = '0';
-                    setTimeout(function() {
-                        preloader.style.display = 'none';
-                    }, 600); 
-                }, 300); 
+                    preloader.style.display = 'none';
+                }, 600); 
             }
+        }
+
+        // 1. Standar Eksekusi: Berjalan setelah semua resource utama selesai dimuat
+        window.addEventListener('load', function() {
+            setTimeout(removePreloaderSafe, 300); 
+        });
+
+        // 2. Safe Fail-Safe Timeout: Eksekusi paksa maksimal 4 detik setelah struktur DOM siap,
+        // mencegah stuck/loading berputar selamanya jika listener Firebase, koneksi lambat, atau asset berat gagal dimuat di perangkat mobile.
+        window.addEventListener('DOMContentLoaded', function() {
+            setTimeout(removePreloaderSafe, 4000);
         });
 
         const nomorWA = "+6281221548310"; 
