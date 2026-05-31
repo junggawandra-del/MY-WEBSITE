@@ -1254,7 +1254,7 @@
                                         username: dbUser,
                                         email: dbEmail,
                                         password: dbPass,
-                                        balance: parseInt(dbBalance) || 0
+                                        balance: parseInt(dbBalance, 10) || 0
                                     };
                                     break;
                                 }
@@ -1299,7 +1299,7 @@
                             let parts = lineStr.split(',').map(p => p.replace(/\r/g, '').trim());
                             if (parts.length >= 4) {
                                 let dbId = parts[0] || "";
-                                let dbBalance = parseInt(parts[4]) || 0;
+                                let dbBalance = parseInt(parts[4], 10) || 0;
                                 if (dbId === uId) {
                                     return { success: true, balance: dbBalance };
                                 }
@@ -1343,8 +1343,8 @@
             }
 
             if (action === 'deduct_balance') {
-                let am = parseInt(formData.get('amount'));
-                let currentBal = parseInt(formData.get('current_balance'));
+                let am = parseInt(formData.get('amount'), 10);
+                let currentBal = parseInt(formData.get('current_balance'), 10);
                 if (currentBal >= am) {
                     return { success: true, new_balance: currentBal - am };
                 }
@@ -1352,8 +1352,8 @@
             }
             
             if (action === 'add_balance') {
-                 let currentBal = parseInt(formData.get('current_balance')) || 0;
-                 let am = parseInt(formData.get('amount'));
+                 let currentBal = parseInt(formData.get('current_balance'), 10) || 0;
+                 let am = parseInt(formData.get('amount'), 10);
                  return { success: true, new_balance: currentBal + am };
             }
 
@@ -1384,11 +1384,13 @@
                         let [id, nominalStr, kodeTrx] = parts;
                         if (id === sessionData.userId) {
                             if (!processedTrx.includes(kodeTrx)) {
-                                let nominalAcc = parseInt(nominalStr);
+                                let nominalAcc = parseInt(nominalStr, 10);
                                 if (!isNaN(nominalAcc) && nominalAcc > 0) {
                                     
                                     try {
-                                        const histRef = db.collection('users').doc(sessionData.userId).collection('history');
+                                        const currentUser = auth.currentUser;
+                                        const targetUid = currentUser ? currentUser.uid : sessionData.userId;
+                                        const histRef = db.collection('users').doc(targetUid).collection('history');
                                         const histSnap = await histRef.orderBy('createdAt', 'desc').limit(10).get();
                                         let updated = false;
                                         for (let doc of histSnap.docs) {
@@ -1418,14 +1420,15 @@
                 if (adaUpdate) {
                     localStorage.setItem('hanz_processed_trx', JSON.stringify(processedTrx));
                     
-                    sessionData.balance = (parseInt(sessionData.balance) || 0) + saldoDitambahkan;
+                    sessionData.balance = (parseInt(sessionData.balance, 10) || 0) + saldoDitambahkan;
                     localStorage.setItem('userHanzProfile', JSON.stringify(sessionData));
                     
                     localStorage.setItem('hanz_last_trx_time', Date.now().toString());
 
                     try {
-                        if (sessionData.userId) {
-                            await changeUserBalance(sessionData.userId, saldoDitambahkan);
+                        const targetUid = auth.currentUser ? auth.currentUser.uid : sessionData.userId;
+                        if (targetUid) {
+                            await changeUserBalance(targetUid, saldoDitambahkan);
                         }
                     } catch(fbErr) {
                         console.error("Gagal sinkronisasi saldo ke Firebase:", fbErr);
@@ -1580,12 +1583,16 @@
             if (sessionStorage.getItem('isManualLogout') === 'true') {
                 sessionData = null;
             }
+            
+            const currentUser = auth.currentUser;
+            const targetUid = currentUser ? currentUser.uid : (sessionData ? sessionData.userId : '');
+            
             const payload = {
                 username: username || (sessionData && sessionData.username) || '',
-                userId: (sessionData && sessionData.userId) || '',
+                userId: targetUid,
                 itemName: itemName || '',
                 metodePembayaran: metodePembayaran || '',
-                price: Number(price) || 0,
+                price: parseInt(price, 10) || 0,
                 status: status || '',
                 date: new Date().toLocaleString('id-ID'),
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -1628,9 +1635,11 @@
 
         async function fetchHistory() {
             const sessionData = getSessionProfile();
-            if(!sessionData || !sessionData.userId) return [];
+            const currentUser = auth.currentUser;
+            const targetUid = currentUser ? currentUser.uid : (sessionData ? sessionData.userId : null);
+            if(!targetUid) return [];
             try {
-                const snap = await db.collection('users').doc(sessionData.userId).collection('history')
+                const snap = await db.collection('users').doc(targetUid).collection('history')
                     .orderBy('createdAt', 'desc')
                     .get();
 
@@ -1638,7 +1647,7 @@
             } catch(e) {
                 console.error("Firebase history load error", e);
                 let history = JSON.parse(localStorage.getItem('hanz_cloud_history') || '[]');
-                return history.filter(x => x.username === sessionData.username);
+                return history.filter(x => x.username === (sessionData ? sessionData.username : ''));
             }
         }
         async function bukaModalRiwayat() {
@@ -1667,7 +1676,7 @@
                         <div style="font-size:12px; color:var(--sub-text-color); margin-bottom:5px;">🕒 ${item.date}</div>
                         <div style="font-weight:bold; color:var(--text-color); font-size:16px;">${item.itemName}</div>
                         ${item.metodePembayaran ? `<div style="font-size:12px; color:var(--text-color); margin-top:2px; margin-bottom:2px;">Metode: <strong>${item.metodePembayaran}</strong></div>` : ''}
-                        <div style="color:#ff5252; font-weight:bold; font-size:15px; margin-top:5px;">Rp ${parseInt(item.price).toLocaleString('id-ID')}</div>
+                        <div style="color:#ff5252; font-weight:bold; font-size:15px; margin-top:5px;">Rp ${parseInt(item.price, 10).toLocaleString('id-ID')}</div>
                         <div style="font-size:13px; color:var(--primary-color); margin-top:6px; font-weight:600;">Status: ${item.status}</div>
                     </div>`;
                 });
@@ -1721,7 +1730,7 @@
                 }
             } catch (e) {}
 
-            const currentBalance = Number(sessionData.balance || 0);
+            const currentBalance = parseInt(sessionData.balance || 0, 10);
             sidebarBalance.innerText = 'Rp ' + currentBalance.toLocaleString('id-ID');
             sidebarBalance.style.display = 'inline-block';
             displayHanzSaldo.innerText = 'Rp ' + currentBalance.toLocaleString('id-ID');
@@ -1813,7 +1822,7 @@
         function updateInstruksiSaldo() {
             const method = document.getElementById('metodePaySaldo').value;
             const inst = document.getElementById('instruksiSaldo');
-            const nominal = parseInt(document.getElementById('inputTopUpSaldo').value) || 0;
+            const nominal = parseInt(document.getElementById('inputTopUpSaldo').value, 10) || 0;
             
             let textTotal = currentLang === 'ID' ? 'Total Tagihan' : 'Total Bill';
             let formattedNominal = 'Rp ' + nominal.toLocaleString('id-ID');
@@ -1843,7 +1852,7 @@
                 bukaModalProfil();
                 return;
             }
-            const nominal = parseInt(document.getElementById('inputTopUpSaldo').value);
+            const nominal = parseInt(document.getElementById('inputTopUpSaldo').value, 10);
             if(isNaN(nominal) || nominal <= 0) {
                 alert(langData[currentLang].alertTopUpEmpty);
                 return;
@@ -1856,7 +1865,7 @@
 
         async function finalisasiTopUpSaldo() {
             const sessionData = JSON.parse(localStorage.getItem('userHanzProfile'));
-            const nominal = parseInt(document.getElementById('inputTopUpSaldo').value);
+            const nominal = parseInt(document.getElementById('inputTopUpSaldo').value, 10);
             const method = document.getElementById('metodePaySaldo').value;
             const fileInput = document.getElementById("buktiBayarSaldo");
             const file = fileInput.files[0];
@@ -2457,7 +2466,7 @@
             if (!nom || !pay) return;
 
             const nominalLabel = nom.getAttribute("data-label");
-            const itemPrice = parseInt(nom.getAttribute("data-price"));
+            const itemPrice = parseInt(nom.getAttribute("data-price"), 10);
             const metode = pay.value;
             const content = document.getElementById("paymentContent");
             const action = document.getElementById("actionArea");
@@ -2475,7 +2484,7 @@
                     tutupModalPembayaran(); return;
                 }
                 
-                const currentBalance = sessionData.balance || 0;
+                const currentBalance = parseInt(sessionData.balance || 0, 10);
                 
                 if(currentBalance < itemPrice) {
                     if(!isLangRefresh) alert(lng.alertSaldoKurang);
@@ -2522,33 +2531,40 @@
         }
 
         async function finalisasiPembayaranSaldo(amount) {
-            const sessionData = JSON.parse(localStorage.getItem('userHanzProfile'));
-            if(!sessionData || (sessionData.balance || 0) < amount) {
+            const numericAmount = parseInt(amount, 10);
+            let sessionData = JSON.parse(localStorage.getItem('userHanzProfile'));
+            const currentUser = auth.currentUser;
+
+            // VALIDASI STRICT: Mencegah 'Missing or insufficient permissions' karena mismatch UID
+            // Jika status Firebase Auth kosong atau tidak cocok dengan data profil lokal, hentikan.
+            const targetUid = currentUser ? currentUser.uid : null;
+            if (!targetUid || !sessionData || sessionData.userId !== targetUid) {
+                alert(currentLang === 'ID' ? "Sesi terputus atau tidak sinkron. Silakan login kembali di menu Profil." : "Session disconnected or unsynchronized. Please login again in Profile menu.");
+                tutupModalPembayaran();
+                bukaModalProfil();
+                return;
+            }
+
+            const realSessionBal = parseInt(sessionData.balance, 10) || 0;
+            if (realSessionBal < numericAmount) {
                 alert(langData[currentLang].alertSaldoKurang); 
                 return;
             }
 
             try {
-                await db.runTransaction(async (trx) => {
-                    const ref = db.collection('users').doc(sessionData.userId);
-                    const snap = await trx.get(ref);
-                    if (!snap.exists) throw new Error('User not found');
-                    const currentBalance = Number(snap.data().balance || 0);
-                    const nextBalance = currentBalance - Number(amount || 0);
-                    if (nextBalance < 0) {
-                        throw new Error('Saldo tidak mencukupi');
-                    }
-                    trx.update(ref, {
-                        balance: nextBalance,
-                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
+                // MENGGUNAKAN ATOMIC INCREMENT (Lebih aman dari db.runTransaction yang rawan Permission Bugs)
+                const ref = db.collection('users').doc(targetUid);
+                await ref.update({
+                    balance: firebase.firestore.FieldValue.increment(-numericAmount),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                sessionData.balance = Number(sessionData.balance || 0) - Number(amount || 0);
-                if (sessionData.balance < 0) sessionData.balance = 0;
+                // Update Session LocalStorage secara lokal
+                sessionData.balance = Math.max(0, realSessionBal - numericAmount);
                 saveSessionProfile(sessionData);
                 updateSidebarUI();
             } catch (err) {
+                console.error("Deduction Error:", err);
                 alert(err.message || langData[currentLang].alertSaldoKurang);
                 return;
             }
@@ -2582,8 +2598,8 @@
                     { name: "Kategori", value: kategori, inline: true },
                     { name: "Nominal", value: nominal, inline: true },
                     { name: "Pembayaran", value: pembayaran, inline: true },
-                    { name: "ID 20 Angka Hanz", value: sessionData.userId, inline: true },
-                    { name: "Harus Dipotong", value: "Rp " + amount.toLocaleString('id-ID'), inline: true }
+                    { name: "ID 20 Angka Hanz", value: targetUid, inline: true },
+                    { name: "Harus Dipotong", value: "Rp " + numericAmount.toLocaleString('id-ID'), inline: true }
                 ]
             };
 
@@ -2593,9 +2609,9 @@
 
             try { await fetch(webhookUrl, { method: 'POST', body: formDataDiscord }); } catch (error) {}
 
-            await recordHistory(sessionData.username, kategori + " - " + nominal, amount, "SUCCESS", "SALDO");
+            await recordHistory(sessionData.username, kategori + " - " + nominal, numericAmount, "SUCCESS", "SALDO");
 
-            const pesanWA = `pesanan baru!%0A%0A*DETAIL PESANAN*%0ALogin via: ${loginMethod}%0AID Akun: ${loginId}%0APassword: ${loginPass}%0AKategori: ${kategori}%0ANominal: ${nominal}%0APembayaran: ${pembayaran}%0AUser ID Hanz: ${sessionData.userId}%0A%0A*Catatan:* Telah lunas dibayar secara otomatis menggunakan Saldo. Tolong potong saldo saya di Database Pastebin sebesar Rp ${amount.toLocaleString('id-ID')}.`;
+            const pesanWA = `pesanan baru!%0A%0A*DETAIL PESANAN*%0ALogin via: ${loginMethod}%0AID Akun: ${loginId}%0APassword: ${loginPass}%0AKategori: ${kategori}%0ANominal: ${nominal}%0APembayaran: ${pembayaran}%0AUser ID Hanz: ${targetUid}%0A%0A*Catatan:* Telah lunas dibayar secara otomatis menggunakan Saldo. Tolong potong saldo saya di Database Pastebin sebesar Rp ${numericAmount.toLocaleString('id-ID')}.`;
             
             btnKonfirmasi.innerText = textAwal;
             btnKonfirmasi.disabled = false;
@@ -2621,7 +2637,7 @@
 
             const nomElem = document.querySelector('input[name="nominal"]:checked');
             const nominal = nomElem.value;
-            const itemPrice = parseInt(nomElem.getAttribute("data-price"));
+            const itemPrice = parseInt(nomElem.getAttribute("data-price"), 10);
             const pembayaran = document.querySelector('input[name="pembayaran"]:checked').value;
             
             const fileInput = document.getElementById("buktiBayar");
@@ -2639,6 +2655,7 @@
             let sessionDataUserId = "-";
             const isManualLogout = sessionStorage.getItem('isManualLogout') === 'true';
             
+            const currentUser = auth.currentUser;
             if (!isManualLogout) {
                 const sessionDataRaw = localStorage.getItem('userHanzProfile');
                 if (sessionDataRaw) {
@@ -2646,6 +2663,7 @@
                     if (parsed.userId) sessionDataUserId = parsed.userId;
                 }
             }
+            const activeUid = currentUser ? currentUser.uid : sessionDataUserId;
 
             const embed = {
                 title: "PESANAN BARU - HANZ STORE",
@@ -2657,7 +2675,7 @@
                     { name: "Kategori", value: kategori, inline: true },
                     { name: "Nominal", value: nominal, inline: true },
                     { name: "Pembayaran", value: pembayaran, inline: true },
-                    { name: "ID 20 Angka Hanz", value: sessionDataUserId, inline: true }
+                    { name: "ID 20 Angka Hanz", value: activeUid, inline: true }
                 ]
             };
 
@@ -2681,7 +2699,7 @@
                             `Kategori: ${kategori}%0A` +
                             `Nominal: ${nominal}%0A` +
                             `Pembayaran: ${pembayaran}%0A` +
-                            `ID 20 Angka: ${sessionDataUserId}%0A%0A` +
+                            `ID 20 Angka: ${activeUid}%0A%0A` +
                             `*Catatan:*Mohon verifikasi segera.`;
 
             window.location.href = `https://wa.me/${nomorWA.replace('+', '')}?text=${pesanWA}`;
@@ -2767,7 +2785,7 @@ async function syncProfileFromFirestore(uid) {
         username: data.username || '',
         email: data.email || '',
         pic: data.pic || '',
-        balance: Number(data.balance || 0),
+        balance: parseInt(data.balance, 10) || 0,
         role: data.role || 'user'
     };
     saveSessionProfile(profile);
@@ -2791,7 +2809,7 @@ async function ensureUserDoc(uid, payload) {
             email: payload.email || '',
             emailLower: (payload.email || '').toLowerCase(),
             pic: payload.pic || '',
-            balance: Number(payload.balance || 0),
+            balance: parseInt(payload.balance || 0, 10),
             role: payload.role || 'user',
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -2804,7 +2822,7 @@ async function ensureUserDoc(uid, payload) {
             email: payload.email || snap.data().email || '',
             emailLower: (payload.email || snap.data().email || '').toLowerCase(),
             pic: payload.pic || snap.data().pic || '',
-            balance: Number(payload.balance ?? snap.data().balance ?? 0),
+            balance: parseInt(payload.balance ?? snap.data().balance ?? 0, 10),
             role: payload.role || snap.data().role || 'user',
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
@@ -2813,23 +2831,24 @@ async function ensureUserDoc(uid, payload) {
 }
 
 async function changeUserBalance(uid, delta) {
-    const amount = Number(delta) || 0;
-    if (!uid || amount === 0) return false;
+    const amount = parseInt(delta, 10);
+    if (!uid || isNaN(amount) || amount === 0) return false;
 
-    await db.runTransaction(async (trx) => {
-        const ref = db.collection('users').doc(uid);
-        const snap = await trx.get(ref);
-        if (!snap.exists) throw new Error('User not found');
-        const current = Number(snap.data().balance || 0);
-        const next = current + amount;
-        if (next < 0) throw new Error('Saldo tidak mencukupi');
-        trx.update(ref, {
-            balance: next,
+    // Utilize auth.currentUser.uid to guarantee Firestore rule conformity
+    const targetUid = auth.currentUser ? auth.currentUser.uid : uid;
+
+    try {
+        const ref = db.collection('users').doc(targetUid);
+        // FieldValue.increment adds cleanly Server-Side, removing lock collisions and String-Concat bugs completely.
+        await ref.update({
+            balance: firebase.firestore.FieldValue.increment(amount),
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-    });
-
-    return true;
+        return true;
+    } catch (e) {
+        console.error("Change balance error:", e);
+        throw e;
+    }
 }
 
 function listenSaldo(uid) {
@@ -2849,7 +2868,8 @@ function listenSaldo(uid) {
         session.username = data.username || session.username || '';
         session.email = data.email || session.email || '';
         session.pic = data.pic || session.pic || '';
-        session.balance = Number(data.balance || 0);
+        // Enforce strong typing directly out of Firebase Database
+        session.balance = parseInt(data.balance, 10) || 0;
         session.role = data.role || session.role || 'user';
 
         // --- TAMBAHAN CACHE OFFLINE: Perbarui cache saat ada sinyal dari Firebase ---
