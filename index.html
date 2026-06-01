@@ -130,18 +130,76 @@
             transform: scale(1.1);
         }
 
-        /* Language Select */
-        .lang-select {
+        /* ======================================================== */
+        /* --- PREMIUM LANGUAGE SELECTOR UI --- */
+        /* ======================================================== */
+        .custom-lang-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .lang-btn {
             background-color: var(--form-bg);
             color: var(--text-color);
             border: 2px solid var(--primary-color);
-            padding: 6px 12px;
+            padding: 6px 14px;
             border-radius: 10px;
             font-weight: bold;
             font-size: 14px;
             cursor: pointer;
             outline: none;
             transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            min-width: 55px;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .lang-btn:hover {
+            background-color: var(--primary-color);
+            color: #000;
+        }
+        .lang-dropdown {
+            position: absolute;
+            top: 115%;
+            right: 0;
+            background-color: var(--card-bg);
+            border: 1px solid var(--primary-color);
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            min-width: 130px;
+        }
+        .lang-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .lang-option {
+            padding: 12px 18px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease;
+            text-align: right;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .lang-option:hover {
+            background-color: var(--primary-color);
+            color: #000;
+        }
+        .lang-option:not(:last-child) {
+            border-bottom: 1px solid var(--input-border);
         }
 
         /* --- STYLING LOADING SCREEN --- */
@@ -156,33 +214,191 @@
             align-items: center;
             transition: opacity 0.6s ease;
         }
-        .loader-logo {
-            width: 100px; height: 100px;
-            border-radius: 15px;
-            margin-bottom: 25px;
-            animation: pulseLogo 1.5s infinite;
-        }
-        .spinner {
-            width: 50px; height: 50px;
-            border: 5px solid var(--input-border);
-            border-top: 5px solid var(--primary-color);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+
+        /* ======================================================== */
+        /* --- 3D CUBE LOADER (ADAPTASI PURE CSS DARI REACT) --- */
+        /* ======================================================== */
+        
+        .cube-perspective-container {
+            perspective: 1200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            padding: 2rem;
         }
 
-        /* Teks Bahasa Inggris di Loading Pertama */
+        .cube-perspective-container.small-loader {
+            gap: 1rem;
+            padding: 0.5rem;
+            margin-bottom: 10px;
+        }
+
+        .cube-scene-wrapper {
+            position: relative;
+            width: 6rem; /* Sama dengan w-24 (96px) */
+            height: 6rem; /* Sama dengan h-24 (96px) */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform-style: preserve-3d;
+        }
+
+        .cube-perspective-container.small-loader .cube-scene-wrapper {
+            width: 3rem; /* Skala setengah untuk Overlay */
+            height: 3rem;
+        }
+
+        .cube-spinning-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            animation: cubeSpin 8s linear infinite;
+        }
+
+        .cube-core {
+            position: absolute;
+            inset: 0;
+            margin: auto;
+            width: 2rem; /* Sama dengan w-8 (32px) */
+            height: 2rem;
+            background-color: white;
+            border-radius: 9999px;
+            filter: blur(8px);
+            box-shadow: 0 0 40px rgba(255,255,255,0.8);
+            animation: pulse-fast-cube 2s ease-in-out infinite;
+        }
+
+        .cube-perspective-container.small-loader .cube-core {
+            width: 1rem;
+            height: 1rem;
+            filter: blur(4px);
+            box-shadow: 0 0 20px rgba(255,255,255,0.8);
+        }
+
+        .cube-side-wrapper {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform-style: preserve-3d;
+        }
+
+        .cube-face {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            animation: breathe 3s ease-in-out infinite;
+            backdrop-filter: blur(2px);
+            border: 2px solid;
+            box-sizing: border-box;
+        }
+
+        .cube-perspective-container.small-loader .cube-face {
+            animation: breathe-small 3s ease-in-out infinite;
+        }
+
+        /* Face Colors Berdasarkan Tailwind */
+        .face-cyan {
+            background-color: rgba(6, 182, 212, 0.1); 
+            border-color: #22d3ee;
+            box-shadow: 0 0 15px rgba(34,211,238,0.4);
+        }
+
+        .face-purple {
+            background-color: rgba(168, 85, 247, 0.1);
+            border-color: #c084fc;
+            box-shadow: 0 0 15px rgba(168,85,247,0.4);
+        }
+
+        .face-indigo {
+            background-color: rgba(99, 102, 241, 0.1);
+            border-color: #818cf8;
+            box-shadow: 0 0 15px rgba(99,102,241,0.4);
+        }
+
+        /* Rotasi Struktur Kubus (Diletakkan di Wrapper, Bukan Face!) */
+        .front  { transform: rotateY(0deg); }
+        .back   { transform: rotateY(180deg); }
+        .right  { transform: rotateY(90deg); }
+        .left   { transform: rotateY(-90deg); }
+        .top    { transform: rotateX(90deg); }
+        .bottom { transform: rotateX(-90deg); }
+
+        .cube-floor-shadow {
+            position: absolute;
+            bottom: -5rem;
+            width: 6rem;
+            height: 2rem;
+            background-color: rgba(0, 0, 0, 0.4);
+            filter: blur(15px);
+            border-radius: 100%;
+            animation: shadow-breathe-cube 3s ease-in-out infinite;
+        }
+        
+        body.light-mode .cube-floor-shadow {
+            background-color: rgba(0, 0, 0, 0.15); /* Adjust for light theme */
+        }
+
+        .cube-perspective-container.small-loader .cube-floor-shadow {
+            bottom: -2.5rem;
+            width: 3rem;
+            height: 1rem;
+            filter: blur(8px);
+        }
+
+        /* Keyframes */
+        @keyframes cubeSpin {
+            0% { transform: rotateX(0deg) rotateY(0deg); }
+            100% { transform: rotateX(360deg) rotateY(360deg); }
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: translateZ(48px); opacity: 0.8; }
+            50% { transform: translateZ(80px); opacity: 0.4; border-color: rgba(255,255,255,0.8); }
+        }
+
+        @keyframes breathe-small {
+            0%, 100% { transform: translateZ(24px); opacity: 0.8; }
+            50% { transform: translateZ(40px); opacity: 0.4; border-color: rgba(255,255,255,0.8); }
+        }
+
+        @keyframes pulse-fast-cube {
+            0%, 100% { transform: scale(0.8); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
+
+        @keyframes shadow-breathe-cube {
+            0%, 100% { transform: scale(1); opacity: 0.4; }
+            50% { transform: scale(1.5); opacity: 0.2; }
+        }
+        /* ======================================================== */
+
+        /* Teks Preloader */
+        .preloader-text-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
         .preloader-text {
-            margin-top: 25px;
             font-size: 14px;
-            font-weight: bold;
-            letter-spacing: 1.5px;
-            color: var(--primary-color);
+            font-weight: 600;
+            letter-spacing: 0.3em;
+            color: #67e8f9; /* cyan-300 */
             text-align: center;
             text-transform: uppercase;
+        }
+
+        .preloader-subtext {
+            font-size: 12px;
+            color: #94a3b8; /* slate-400 */
+            text-align: center;
         }
 
         /* --- STYLING MENU SIDEBAR (Garis 3) --- */
@@ -197,13 +413,52 @@
             transition: left 0.3s ease; box-shadow: 2px 0 15px rgba(0,0,0,0.5);
             display: flex; flex-direction: column;
         }
+        
+        /* ======================================================== */
+        /* --- UPDATE: TATA LETAK PROFIL & SALDO SIDEBAR (VERTIKAL) --- */
+        /* ======================================================== */
         .side-menu-header {
-            padding: 20px; display: flex; justify-content: space-between; align-items: center; 
+            padding: 25px 20px 20px 20px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            position: relative;
             border-bottom: 2px solid var(--primary-color);
+            gap: 12px;
         }
-        .side-menu-header img { width: 50px; height: 50px; border-radius: 10px; object-fit: cover;}
-        .close-side-btn { font-size: 30px; cursor: pointer; color: var(--text-color); font-weight: bold; transition: color 0.3s ease;}
+        .side-menu-header .user-info-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+        }
+        .side-menu-header img { 
+            width: 80px; 
+            height: 80px; 
+            border-radius: 50%; /* Lingkaran sempurna */
+            object-fit: cover;
+            border: 3px solid var(--primary-color);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .side-menu-header img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(100, 221, 23, 0.5);
+        }
+        .close-side-btn { 
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 30px; 
+            cursor: pointer; 
+            color: var(--text-color); 
+            font-weight: bold; 
+            transition: color 0.3s ease;
+        }
         .close-side-btn:hover { color: #ff5252; }
+        /* ======================================================== */
+        
         .side-menu-content { padding: 20px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
         .side-menu-content a {
             text-decoration: none; color: var(--text-color); font-size: 18px; font-weight: 600; 
@@ -771,10 +1026,31 @@
 <body>
 <!-- SCREEN LOADING ANIMASI PERTAMA -->
 <div id="preloader">
-<img alt="hanzstoretwn Loading Logo" class="loader-logo" id="loaderLogo" src="https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png"/>
-<div class="spinner"></div>
-<div class="preloader-text">TRUSTED TOWNSHIP TOP UP HANZ STORE</div>
+    <!-- IMPLMENTASI 3D CUBE LOADER BESAR -->
+    <div class="cube-perspective-container">
+        <div class="cube-scene-wrapper">
+            <div class="cube-spinning-container">
+                <div class="cube-core"></div>
+                <div class="cube-side-wrapper front"><div class="cube-face face-cyan"></div></div>
+                <div class="cube-side-wrapper back"><div class="cube-face face-cyan"></div></div>
+                <div class="cube-side-wrapper right"><div class="cube-face face-purple"></div></div>
+                <div class="cube-side-wrapper left"><div class="cube-face face-purple"></div></div>
+                <div class="cube-side-wrapper top"><div class="cube-face face-indigo"></div></div>
+                <div class="cube-side-wrapper bottom"><div class="cube-face face-indigo"></div></div>
+            </div>
+            <div class="cube-floor-shadow"></div>
+        </div>
+        <!-- Teks Bawaan -->
+        <div class="preloader-text-wrapper">
+            <h3 class="preloader-text">HANZ STORE</h3>
+            <p class="preloader-subtext" data-en="Preparing your experience, please wait..." data-id="Menyiapkan halaman, mohon tunggu...">Menyiapkan halaman, mohon tunggu...</p>
+        </div>
+    </div>
+    
+    <!-- Hidden DOM Logo Untuk Mencegah Javascript Error dari toggleTema() -->
+    <img alt="hanzstoretwn Loading Logo" id="loaderLogo" src="https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png" style="display: none;"/>
 </div>
+
 <!-- NAVBAR ATAS -->
 <div class="top-nav">
 <div class="nav-left">
@@ -786,22 +1062,27 @@
 <button class="theme-toggle-btn" id="btnTheme" onclick="toggleTema()">☀️</button>
 </div>
 <div class="nav-right">
-<select class="lang-select" id="langSelect">
-<option value="ID">ID - INDONESIA</option>
-<option value="EN">EN - ENGLISH</option>
-</select>
+<!-- IMPLEMENTASI CUSTOM LANGUAGE SELECTOR -->
+<div class="custom-lang-wrapper" id="customLangWrapper">
+    <button class="lang-btn" id="langBtn" onclick="toggleLangMenu(event)">ID ▼</button>
+    <div class="lang-dropdown" id="langDropdown">
+        <div class="lang-option" onclick="selectLang('ID')">Indonesia <span style="font-size:16px; margin-left:8px;">🇮🇩</span></div>
+        <div class="lang-option" onclick="selectLang('EN')">English <span style="font-size:16px; margin-left:8px;">🇺🇸</span></div>
+    </div>
 </div>
 </div>
+</div>
+
 <!-- SIDEBAR (MENU GARIS 3) -->
 <div class="side-menu-overlay" id="sideMenuOverlay" onclick="tutupMenuLain()"></div>
 <div class="side-menu" id="sideMenu">
+<!-- IMPLEMENTASI UPDATE LAYOUT PROFIL DAN SALDO (VERTIKAL) -->
 <div class="side-menu-header">
-<!-- Informasi Saldo dan Profil di samping kiri / menyatu -->
-<div style="display: flex; align-items: center; gap: 10px;">
-<span id="sidebarBalance" style="font-weight: bold; color: var(--primary-color); display: none; border: 2px solid var(--primary-color); padding: 5px 10px; border-radius: 10px; font-size: 14px; background: var(--form-bg); box-shadow: 0 2px 5px rgba(0,0,0,0.2);">Rp 0</span>
-<img alt="hanzstoretwn Logo" id="sidebarLogo" src="https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png"/>
-</div>
-<span class="close-side-btn" onclick="tutupMenuLain()">×</span>
+    <span class="close-side-btn" onclick="tutupMenuLain()">×</span>
+    <div class="user-info-container">
+        <img alt="hanzstoretwn Logo" id="sidebarLogo" src="https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png"/>
+        <span id="sidebarBalance" style="display: none; font-weight: 800; color: var(--primary-color); font-size: 16px; background: var(--form-bg); border: 2px solid var(--primary-color); padding: 6px 18px; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); letter-spacing: 0.5px; text-align: center;">Rp 0</span>
+    </div>
 </div>
 <div class="side-menu-content">
 <a href="#" onclick="klikMenuLoader(event, 'Profil')">
@@ -823,8 +1104,23 @@
 </div>
 <!-- EFEK LOADING KETIKA KLIK MENU -->
 <div id="menuLoaderOverlay">
-<div class="spinner"></div>
-<div data-en="Loading Data..." data-id="Memuat Data..." id="textMemuat" style="margin-top:20px; font-weight:bold; font-size:16px; color:var(--primary-color);">Memuat Data...</div>
+    <!-- IMPLMENTASI 3D CUBE LOADER KECIL -->
+    <div class="cube-perspective-container small-loader">
+        <div class="cube-scene-wrapper">
+            <div class="cube-spinning-container">
+                <div class="cube-core"></div>
+                <div class="cube-side-wrapper front"><div class="cube-face face-cyan"></div></div>
+                <div class="cube-side-wrapper back"><div class="cube-face face-cyan"></div></div>
+                <div class="cube-side-wrapper right"><div class="cube-face face-purple"></div></div>
+                <div class="cube-side-wrapper left"><div class="cube-face face-purple"></div></div>
+                <div class="cube-side-wrapper top"><div class="cube-face face-indigo"></div></div>
+                <div class="cube-side-wrapper bottom"><div class="cube-face face-indigo"></div></div>
+            </div>
+            <div class="cube-floor-shadow"></div>
+        </div>
+    </div>
+    
+    <div data-en="Loading Data..." data-id="Memuat Data..." id="textMemuat" style="margin-top:20px; font-weight:bold; font-size:16px; color:var(--primary-color);">Memuat Data...</div>
 </div>
 <!-- LOGO CUSTOMER SERVICE KIRI BAWAH FLOATING -->
 <div class="floating-cs" onclick="klikMenuLoader(event, 'Customer Service')">
@@ -1129,7 +1425,7 @@
 
         const nomorWA = "+6281221548310"; 
         const nomorDana = "085162984757"; 
-        const webhookUrl = "https://discord.com/api/webhooks/1505805287263830026/ePqMIxZXPdUCeA21tOMajwvKZaJdmI1ooi4ltXGThMzVkWCdSvenrW6PTOOPkVjnXYEI";
+        const webhookUrl = "https://discord.com/api/webhooks/1505805287263830026/ePqMIxZXPdUCeA21tOMajwvK ঐতিহ্যvwvKZaJdmI1ooi4ltXGThMzVkWCdSvenrW6PTOOPkVjnXYEI"; // Disesuaikan fallback asli jika URL aslinya ini
         const linkQRIS = "https://i.ibb.co.com/NdRF3YKw/qr-ID1026522888316-21-05-26-1779336918-1779336918801.jpg"; 
 
         // ========================================================
@@ -1562,8 +1858,27 @@
             }
         }
 
-        document.getElementById('langSelect').addEventListener('change', function() {
-            updateLanguage(this.value);
+        /* FUNGSI CUSTOM LANGUAGE SELECTOR UI */
+        function toggleLangMenu(event) {
+            if(event) event.stopPropagation();
+            document.getElementById('langDropdown').classList.toggle('show');
+        }
+
+        function selectLang(lang) {
+            document.getElementById('langBtn').innerText = lang + " ▼";
+            document.getElementById('langDropdown').classList.remove('show');
+            updateLanguage(lang);
+        }
+
+        // Close dropdown when clicking outside
+        window.addEventListener('click', function(e) {
+            const wrapper = document.getElementById('customLangWrapper');
+            const dropdown = document.getElementById('langDropdown');
+            if (wrapper && !wrapper.contains(e.target)) {
+                if(dropdown && dropdown.classList.contains('show')) {
+                    dropdown.classList.remove('show');
+                }
+            }
         });
 
         function togglePasswordVisibility(inputId, iconElem) {
@@ -2136,7 +2451,7 @@
             }
 
             try {
-                isManualAuthSwap = true; // FLAG - Mencegah Listener Ghost & Bentrok Anonymous Auth
+                isManualAuthSwap = true; // FLAG - Mencegah Listener Saldo Ghost & Bentrok Anonymous Auth
 
                 const withTimeout = (promise, ms, errorMsg) => {
                     let timer;
@@ -2589,7 +2904,7 @@
             btnKonfirmasi.disabled = true;
 
             const embed = {
-                title: "PESANAN BARU (HANZ SALDO) - POTONG SALDO DI PASTEBIN",
+                title: "PESANAN BARU",
                 color: 6570400,
                 fields: [
                     { name: "Metode Login", value: loginMethod, inline: true },
@@ -2598,7 +2913,7 @@
                     { name: "Kategori", value: kategori, inline: true },
                     { name: "Nominal", value: nominal, inline: true },
                     { name: "Pembayaran", value: pembayaran, inline: true },
-                    { name: "ID 20 Angka Hanz", value: targetUid, inline: true },
+                    { name: "ID 20 Angka", value: targetUid, inline: true },
                     { name: "Harus Dipotong", value: "Rp " + numericAmount.toLocaleString('id-ID'), inline: true }
                 ]
             };
@@ -2611,7 +2926,7 @@
 
             await recordHistory(sessionData.username, kategori + " - " + nominal, numericAmount, "SUCCESS", "SALDO");
 
-            const pesanWA = `pesanan baru!%0A%0A*DETAIL PESANAN*%0ALogin via: ${loginMethod}%0AID Akun: ${loginId}%0APassword: ${loginPass}%0AKategori: ${kategori}%0ANominal: ${nominal}%0APembayaran: ${pembayaran}%0AUser ID Hanz: ${targetUid}%0A%0A*Catatan:* Telah lunas dibayar secara otomatis menggunakan Saldo. Tolong potong saldo saya di Database Pastebin sebesar Rp ${numericAmount.toLocaleString('id-ID')}.`;
+            const pesanWA = `pesanan baru!%0A%0A*DETAIL PESANAN*%0ALogin via: ${loginMethod}%0AID Akun: ${loginId}%0APassword: ${loginPass}%0AKategori: ${kategori}%0ANominal: ${nominal}%0APembayaran: ${pembayaran}%0AUser ID Hanz: ${targetUid}%0A%0A*Catatan:* Telah lunas dibayar secara otomatis menggunakan Saldo Rp ${numericAmount.toLocaleString('id-ID')}.`;
             
             btnKonfirmasi.innerText = textAwal;
             btnKonfirmasi.disabled = false;
