@@ -66,7 +66,7 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
-            padding: 80px 20px 20px 20px; /* Padding atas ditambah untuk navbar */
+            padding: 65px 20px 20px 20px; /* Padding atas disesuaikan dengan navbar yang lebih tipis */
             display: flex;
             justify-content: center;
             min-height: 100vh;
@@ -82,7 +82,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 25px;
+            padding: 6px 20px; /* DIPERBAIKI: Padding dikurangi drastis agar tidak ada blank space atas/bawah */
             box-sizing: border-box;
             background-color: var(--card-bg);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
@@ -200,6 +200,48 @@
         }
         .lang-option:not(:last-child) {
             border-bottom: 1px solid var(--input-border);
+        }
+
+        /* --- STYLING CSS KHUSUS CHROMA KEY (CANVAS REPLACEMENT) --- */
+        
+        /* Menyembunyikan video asli sepenuhnya namun tetap dapat dirender Canvas */
+        .chromakey-video {
+            display: none !important;
+        }
+
+        /* Mewarisi styling visual video sebelumnya ke elemen Canvas baru untuk area Navbar */
+        /* UPDATE: Border, padding, margin disesuaikan agar clean dan tidak ada black bars/bingkai */
+        .top-nav .chromakey-canvas {
+            width: 100px; /* DIPERBAIKI: Diperkecil agar tinggi canvas ikut mengecil proporsional */
+            max-width: 40vw; 
+            height: auto;
+            object-fit: cover;
+            pointer-events: none; 
+            margin: -4px auto; /* DIPERBAIKI: Margin negatif untuk merapatkan logo menghindari blank space */
+            padding: 0;
+            border: none;
+            box-shadow: none;
+            outline: none;
+            background-color: transparent;
+            /* Transparansi nyata (Alpha 0) kini di-handle pure via JS, tidak perlu mix-blend-mode */
+        }
+        
+        /* Jika ada sisa video profil, tetap berikan aturan styling canvas khusus profil */
+        /* UPDATE: Disesuaikan menjadi clean transparan tanpa bingkai */
+        #profilDataView .chromakey-canvas {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            object-fit: cover;
+            margin: 10px 0 15px 0; 
+            position: relative;
+            z-index: 2;
+            pointer-events: none; 
+            padding: 0;
+            border: none;
+            box-shadow: none;
+            outline: none;
+            background-color: transparent;
         }
 
         /* --- STYLING LOADING SCREEN --- */
@@ -693,7 +735,7 @@
         /* ======================================================= */
         @media (min-width: 768px) {
             body {
-                padding: 120px 20px 80px 20px; 
+                padding: 90px 20px 80px 20px; /* Padding atas disesuaikan untuk desktop */
             }
             .container {
                 max-width: 850px; 
@@ -722,7 +764,7 @@
                 border-color: var(--primary-color);
             }
             .top-nav {
-                padding: 15px 8%; 
+                padding: 8px 8%; /* DIPERBAIKI: Padding dikurangi drastis untuk desktop juga */
             }
             .modal-content {
                 max-width: 450px;
@@ -780,6 +822,11 @@
             height: 100%;
             object-fit: cover;
             z-index: 0;
+            border: none;
+            margin: 0;
+            padding: 0;
+            outline: none;
+            background-color: transparent;
         }
         .video-overlay {
             position: absolute;
@@ -1061,6 +1108,13 @@
 </div>
 <button class="theme-toggle-btn" id="btnTheme" onclick="toggleTema()">☀️</button>
 </div>
+
+<!-- ELEMEN VIDEO 16:9 CHROMAKEY SESUAI TANDA MERAH DI NAVBAR -->
+<!-- CROSSORIGIN ADDED UNTUK MENGHINDARI TAINTED CANVAS ERROR -->
+<video autoplay loop muted playsinline crossorigin="anonymous" class="chromakey-video">
+    <source src="https://files.catbox.moe/yzax46.mp4" type="video/mp4">
+</video>
+
 <div class="nav-right">
 <!-- IMPLEMENTASI CUSTOM LANGUAGE SELECTOR -->
 <div class="custom-lang-wrapper" id="customLangWrapper">
@@ -1269,7 +1323,7 @@
 
     <!-- PENAMBAHAN BACKGROUND VIDEO LIVE -->
     <video class="bg-video" autoplay loop muted playsinline>
-        <source src="https://files.catbox.moe/4d9xtb.mp4" type="video/mp4">
+        <source src="https://files.catbox.moe/7zzz90.mp4" type="video/mp4">
     </video>
     <!-- Overlay agar video tidak menyilaukan dan text tetap terbaca jelas -->
     <div class="video-overlay"></div>
@@ -1278,7 +1332,7 @@
     <span class="profile-close-btn" onclick="tutupModalProfil()">×</span>
 
     <h2 data-en="My Profile" data-id="Profil Saya" style="color: var(--primary-color); margin-top: 0; margin-bottom: 12px; font-size: 22px; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); z-index: 2;">Profil Saya</h2>
-    
+
     <div class="profile-avatar-container">
         <img id="displayProfilePic" src="https://i.ibb.co.com/HfFpSK5Z/Proyek-Baru-17-76139-AC.png" alt="Profile"/>
         <label data-en="Change Profile Picture" data-id="Ganti Foto Profil" for="uploadProfilePic" class="btn-change-pic">Ganti Foto Profil</label>
@@ -1400,6 +1454,99 @@
 </div>
 </div>
 </div>
+
+<!-- ======================================================== -->
+<!-- SISTEM CHROMA KEY (GREENSCREEN REMOVAL) REAL-TIME CANVAS -->
+<!-- ======================================================== -->
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+    const videos = document.querySelectorAll('.chromakey-video');
+    
+    videos.forEach(video => {
+        // Buat elemen canvas sebagai pengganti visual
+        const canvas = document.createElement('canvas');
+        canvas.className = 'chromakey-canvas';
+        
+        // Sisipkan canvas tepat setelah elemen video
+        video.parentNode.insertBefore(canvas, video.nextSibling);
+        
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        
+        // Pastikan video auto-play di background (untuk mobile/safari)
+        video.muted = true;
+        video.loop = true;
+        video.setAttribute('playsinline', '');
+        
+        // Tangkap resolusi asli video saat metadata siap
+        video.addEventListener('loadedmetadata', () => {
+            canvas.width = video.videoWidth || 1280;
+            canvas.height = video.videoHeight || 720;
+        });
+
+        // Paksa play video
+        video.play().catch(e => console.log("Auto-play diblokir browser:", e));
+
+        function processFrame() {
+            if (video.paused || video.ended) {
+                requestAnimationFrame(processFrame);
+                return;
+            }
+
+            if (canvas.width > 0 && canvas.height > 0) {
+                // Gambar frame video ke canvas
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                // Ambil data piksel (RGBA)
+                let frame;
+                try {
+                    frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                } catch (e) {
+                    // Mencegah error jika Catbox Tainted Canvas CORS
+                    requestAnimationFrame(processFrame);
+                    return;
+                }
+                
+                let data = frame.data;
+                let l = data.length;
+
+                // Logika Filter Chroma Key (Menghapus Hijau)
+                for (let i = 0; i < l; i += 4) {
+                    let r = data[i];
+                    let g = data[i + 1];
+                    let b = data[i + 2];
+
+                    // Kriteria warna hijau murni
+                    if (g > 90 && g > r * 1.2 && g > b * 1.2) {
+                        data[i + 3] = 0; // Set Alpha = 0 (Transparan total)
+                    } else if (g > 70 && g > r * 1.05 && g > b * 1.05) {
+                        // Anti-aliasing / smoothing untuk tepian
+                        let alpha = 255 - ((g - Math.max(r, b)) * 3);
+                        data[i + 3] = alpha < 0 ? 0 : alpha;
+                    }
+                }
+                
+                // Kembalikan data piksel yang sudah diedit ke canvas
+                ctx.putImageData(frame, 0, 0);
+            }
+            
+            // Looping terus menerus
+            requestAnimationFrame(processFrame);
+        }
+
+        // Mulai proses saat video play
+        video.addEventListener('play', () => {
+            requestAnimationFrame(processFrame);
+        });
+        
+        // Pemicu cadangan jika video sudah play duluan
+        if (!video.paused) {
+            requestAnimationFrame(processFrame);
+        }
+    });
+});
+</script>
+<!-- ======================================================== -->
+
 <script>
         // --- PERBAIKAN LOADING SCREEN STUCK (OPTIMASI FAIL-SAFE & DOMContentLoaded) ---
         function removePreloaderSafe() {
